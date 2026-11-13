@@ -63,6 +63,7 @@
                             <span class="item-name">Dashboard</span>
                         </a>
                     </li>
+                    @if(Auth::user()->role == 0)
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('clients*') ? 'active' : '' }}" 
                         aria-current="page" href="{{ url('/clients') }}">
@@ -74,18 +75,17 @@
                             <span class="item-name">Customers</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('users*') ? 'active' : '' }}" 
-                        aria-current="page" href="{{ url('/users/index') }}">
-                            <i class="icon">
-                           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24">
-                        <image xlink:href="data:image/png;base64,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" x="0" y="0" width="24" height="24"/>
-                        </svg>
+                     <li class="nav-item">
+                        <a class="nav-link {{ request()->is('equipments/index*') ? 'active' : '' }}" 
+                                aria-current="page" href="{{ url('/equipments/index') }}">
+                                    <i class="icon">
+                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24">
+                                <image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAEbElEQVR4AcRVfWwUVRD/zdu93lFKqw0ofgUloagNmAjUHiYGvCsNCsagoomR+ME/NGhEQDE05gQqKhrF4kdQooK2hiYgYCjtXUuhXxSM4SOtJkoL1ARCK1JIS8vtvnF2ub1cqzTRhDh5vzfz5s3Nb97s2z2Fayz/H0FzQcH6pnC4ykNzaNaTwx22YWZhblOoYI8X31RQULF79mz/cCfIJ9AsDwyMH47AMHUxEQq9eGI8fn08vuDvBJGIylu94kEwnUtNeHpUwAyuem1Sqs+zf5w7N52Zfgfog8FAxiCCaZHlY/NUf60kr2Dwn0iR9syMG2zg8H2rV7wFKSJlC7qvL5fAywBekgoGrUoSBCNLskmpBfLDcRKUxZrOi50cfwT8IJAixp35dOmF5IYYtmEk88gyOYiZkhuafJ8QsFaBN0k11DPCJwUnY3HO7wMzjtqaBphoY96bK57wdn1+/zFmvuCtPc2ERpfA7S2p+ZAKNTBHWtTQ4/cjVc4HAhKPqFLs3iYpYg2kB07M1F27+pjVt449CERfuAQMPCUbcgBIGzBJs/7lhztu4hNZ6R87OJ45qrRzZGACiAwAbhyIcvJKVk5BQkxCdcJ0lZxIK9OsShCoKVKNPFd3PiPPYsxvmaMWfzj5riIHpffkLNakCqVHthRju1ESrWxrmptNpssanaKcISGiiC7mV1ZeUONDD+V01bce6apvW+/gbN3P33ftbetw7KE4u6+Vu/e3fuT5z+xry7xZrqikg6FojKPlgmyTNneLnd4UDI5Q2sYeHbdf1Zb9sgNm+xUHjj0UrPUybeklnh9av5120SqRZCDoyY4GU1x6aAt8RkZGrgIjzd34jxPB8EHER/zd8ayM4prbbjx0cOzozd0B/+Js0zymhHoOE0rlaJ/9WzBoDZn9KyU/psZip0onT8zaNf7W98tzxi0vmZbbPqGyckCdqNt9eGuatanMiA+UmZfTynzx2o663UXiX/RPKPfFK8uNuFluWvEK49LO9lisxyG4GlRLOFxo2/qQVL+IQI/Jm7r1QDi8gSMRNRSNoYISaekOOfVCiX/RAjU3h8Pzrpbc8Ssb6l0xOi3TuL3fio+W27cRoKIDDY29Q0GE15EQzWggos1MUlLCl6rI+aiIQxH4bg3a+UBV1emZdXWWQfS5+J0RkGkQCFI7roiRZj4cjEWfnx6Nbr/iAUjpLyVmg0St6w1Y9RBR8n35VabCvTNmXMcAae2+1fJOsWYeDKSIHbe2yJ/LuuZQKOy5A3Z6hwYvJOZ7jy5/r9fxKzlhMcAT/YZ5sikUPinsS4n1NwO2NXIo5AcbBO5QwCMALQWMW5CQukikH6AWKXQ/EqKCsdg2ZjVTWrWTSP0kZEWnsrOflXb1D0V+LPoSCM+B9XZoKlNMhcGa6q8TuVwlvd8kBDvchUxSCHB/bfX+YE3NM9Nj1Y8GY7FP51dUDPpUS5w7SNiD0ehXEjsvWFv9dH5NddTdSJlaitduOfjGO0c8l0vgLa6F/gsAAP//VyGeOwAAAAZJREFUAwBSXFVPk2+OgwAAAABJRU5ErkJggg==" x="0" y="0" width="24" height="24"/>
+                                </svg>
                              </i>
-                            <span class="item-name">Users</span>
+                            <span class="item-name">Inventory</span>
                         </a>
                     </li>
-
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="collapse" href="#horizontal-menu" role="button" aria-expanded="false" aria-controls="horizontal-menu">
                             <i class="icon">
@@ -173,13 +173,15 @@
                                 </a>
                             </li>
                         </ul>
+                        @endif
                     </li>
                     
                     <!-- Equipments -->
-                    @php
+                    {{-- @php
                         $equipmentMenuOpen = request()->routeIs('equipments.*');
-                    @endphp
-                    <li class="nav-item">
+                    @endphp --}}
+                     
+                    {{-- <li class="nav-item">
                         <a class="nav-link {{ $equipmentMenuOpen ? 'active' : '' }}" data-bs-toggle="collapse" href="#sidebar-equipment" role="button" aria-expanded="{{ $equipmentMenuOpen ? 'true' : 'false' }}" aria-controls="sidebar-equipment">
                             <i class="icon">
                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24">
@@ -190,7 +192,7 @@
                         </a>
                         <ul class="sub-nav collapse {{ $equipmentMenuOpen ? 'show' : '' }}" id="sidebar-equipment" data-bs-parent="#sidebar-menu">
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('equipments.index', 'equipments.create', 'equipments.edit') ? 'active' : '' }}" href="{{ route('equipments.index') }}">
+                                <a class="nav-link {{ request()->routeIs('equipments.index', 'equipments.create', 'equipments.edit') ? 'active' : '' }}" >
                                     <i class="icon">
                                         <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
                                             <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
@@ -200,19 +202,9 @@
                                     <span class="item-name">Equipment List</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('equipments.reports') ? 'active' : '' }}" href="{{ route('equipments.reports') }}">
-                                    <i class="icon">
-                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon"> RP </i>
-                                    <span class="item-name">Reports</span>
-                                </a>
-                            </li>
+                           
                         </ul>
-                    </li>
+                    </li> --}}
 
                       <li class="nav-item static-item">
                         <a class="nav-link static-item disabled" href="#" tabindex="-1">
@@ -244,6 +236,7 @@
                             </i>
                         </a>
                         <ul class="sub-nav collapse" id="sidebar-special" data-bs-parent="#sidebar-menu">
+                            @if(Auth::user()->role == 0)
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->is('lf_06_02*') ? 'active' : '' }}" 
                                         aria-current="page" href="{{ url('/lf_06_02') }}">
@@ -272,6 +265,7 @@
                                     <span class="item-name">Order of Payment </span>
                                 </a>
                             </li>
+                            @endif
                             <li class="nav-item">
                                <a class="nav-link {{ request()->is('lf_06_04*') ? 'active' : '' }}" 
                                         aria-current="page" href="{{ url('/lf_06_04') }}">
@@ -312,7 +306,6 @@
                                             </g>
                                         </svg>
                                     </i>
-                                    
                                     <i class="sidenav-mini-icon"> SC </i>
                                     <span class="item-name">Sterility Check </span>
                                 </a>
@@ -328,34 +321,22 @@
                                             </g>
                                         </svg>
                                     </i>
-                                    
                                     <i class="sidenav-mini-icon"> AWBEFFP </i>
                                     <span class="item-name">Analyst Worksheet </span>
                                 </a>
                             </li> --}}
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->is('analyst_worksheet*') ? 'active' : '' }}" 
-                                aria-current="page" href="{{ url('/analyst_worksheet') }}">
-
+                             <li class="nav-item">
+                                <a class="nav-link {{ request()->is('environmental_plan/index*') ? 'active' : '' }}" 
+                                        aria-current="page" href="{{ url('/environmental_plan/index') }}">
                                     <i class="icon">
                                         <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
                                             <g>
-                                                <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
+                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
                                             </g>
                                         </svg>
                                     </i>
-
-                                    <i class="sidenav-mini-icon"> AWBEFFP </i>
-
-                                    <span class="item-name">
-                                        Analyst Worksheet
-
-                                        @if(isset($analystWorksheetCount) && $analystWorksheetCount > 0)
-                                            <span class="badge rounded-pill bg-danger">
-                                                {{ $analystWorksheetCount }}
-                                            </span>
-                                        @endif
-                                    </span>
+                                    <i class="sidenav-mini-icon"> ECF </i>
+                                    <span class="item-name">Environmental Condition Form</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -373,6 +354,27 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link {{ request()->is('analyst_worksheet*') ? 'active' : '' }}" 
+                                aria-current="page" href="{{ url('/analyst_worksheet') }}">
+                                    <i class="icon">
+                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
+                                            <g>
+                                                <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
+                                            </g>
+                                        </svg>
+                                    </i>
+                                    <i class="sidenav-mini-icon"> AWBEFFP </i>
+                                    <span class="item-name">
+                                        Analyst Worksheet
+                                        @if(isset($analystWorksheetCount) && $analystWorksheetCount > 0)
+                                            <span class="badge rounded-pill bg-danger">
+                                                {{ $analystWorksheetCount }}
+                                            </span>
+                                        @endif
+                                    </span>
+                                </a>
+                            </li>
+                            {{-- <li class="nav-item">
                                 <a class="nav-link {{ request()->is('environmental_plan/index*') ? 'active' : '' }}" 
                                         aria-current="page" href="{{ url('/environmental_plan/index') }}">
                                     <i class="icon">
@@ -386,7 +388,7 @@
                                     <i class="sidenav-mini-icon"> ECF </i>
                                     <span class="item-name">Environmental Condition Form</span>
                                 </a>
-                            </li>
+                            </li> --}}
                             <li class="nav-item">
                                   <a class="nav-link {{ request()->is('sample_logbook*') ? 'active' : '' }}" 
                                         aria-current="page" href="{{ url('/sample_logbook') }}">
@@ -432,6 +434,7 @@
                                     </a>
                                 </li>
                             @endif
+                            @if(Auth::user()->role == 0)
                               <li class="nav-item">
                                 <a class="nav-link {{ request()->is('releasing/index*') ? 'active' : '' }}" 
                                         aria-current="page" href="{{ url('/releasing/index') }}">
@@ -446,8 +449,10 @@
                                     <span class="item-name">Receiving & Releasing Logbook</span>
                                 </a>
                             </li>
+                            @endif
                         </ul>
                     </li>
+                    @if(Auth::user()->role == 0)
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="collapse" href="#meow-menu" role="button" aria-expanded="false" aria-controls="meow-menu">
                             <i class="icon">
@@ -464,34 +469,35 @@
                             </i>
                         </a>
                         <ul class="sub-nav collapse" id="meow-menu" data-bs-parent="#sidebar-menu">
-                            {{-- <li class="nav-item">
-                                <a class="nav-link {{ request()->is('QM/index*') ? 'active' : '' }}" 
-                                        aria-current="page" href="{{ url('/QM/index') }}">
-                                  <i class="icon">
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('labtest.reports*') ? 'active' : '' }}" 
+                                        aria-current="page" href="{{ url('/labtest.reports') }}">
+                                    <i class="icon svg-icon">
                                         <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
                                             <g>
                                             <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
                                             </g>
                                         </svg>
                                     </i>
-                                  <i class="sidenav-mini-icon"> LR </i>
-                                  <span class="item-name"> Laboratory </span>
+                                    <i class="sidenav-mini-icon"> LT </i>                   
+                                    <span class="item-name">Laboratory Test</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                     <a class="nav-link {{ request()->is('SOP/index*') ? 'active' : '' }}" 
-                                        aria-current="page" href="{{ url('/SOP/index') }}">
+                             <li class="nav-item">
+                                {{-- <a class="nav-link {{ request()->routeIs('equipments.reports') ? 'active' : '' }}" href="{{ route('equipments.reports') }}"> --}}
+                                     {{-- <a class="nav-link {{ request()->is('equipments.reports*') ? 'active' : '' }}" 
+                                        aria-current="page" href="{{ route('equipments.reports') }}"> --}}
+                                         <a class="nav-link {{ request()->is('equipments/reports*') ? 'active' : '' }}" 
+                                        aria-current="page" href="{{ url('/equipments/reports') }}">
                                     <i class="icon">
                                         <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <g>
                                             <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                            </g>
                                         </svg>
                                     </i>
-                                    <i class="sidenav-mini-icon"> E </i>
-                                    <span class="item-name">Equipments</span>
+                                    <i class="sidenav-mini-icon"> RP </i>
+                                    <span class="item-name">Equipment</span>
                                 </a>
-                            </li> --}}
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->is('payments.reports*') ? 'active' : '' }}" 
                                         aria-current="page" href="{{ url('/payments.reports') }}">
@@ -537,17 +543,6 @@
                         </ul>
                     </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->is('text_blast*') ? 'active' : '' }}" 
-                            aria-current="page" href="{{ url('/text_blast') }}">
-                                <i class="icon">
-                                  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="25" viewBox="0 0 24 25">
-                                     <image xlink:href="data:image/png;base64,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" x="0" y="0" width="24" height="25"/>
-                                </svg>
-                              </i>
-                                <span class="item-name">Text Blast</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                                <a class="nav-link {{ request()->is('citizen-charter-survey*') ? 'active' : '' }}" 
                                 aria-current="page" href="{{ url('/citizen-charter-survey') }}">
                                       <i class="icon">
@@ -560,8 +555,33 @@
                             </li>
                         </ul>
                     </li>
+                      <li class="nav-item">
+                        <a class="nav-link {{ request()->is('users*') ? 'active' : '' }}" 
+                        aria-current="page" href="{{ url('/users/index') }}">
+                            <i class="icon">
+                           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24">
+                        <image xlink:href="data:image/png;base64,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" x="0" y="0" width="24" height="24"/>
+                        </svg>
+                             </i>
+                            <span class="item-name">Users</span>
+                        </a>
+                    </li>
+                    @endif
+                      @if(Auth::user()->role == 10)
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->is('text_blast*') ? 'active' : '' }}" 
+                            aria-current="page" href="{{ url('/text_blast') }}">
+                                <i class="icon">
+                                  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="25" viewBox="0 0 24 25">
+                                     <image xlink:href="data:image/png;base64,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" x="0" y="0" width="24" height="25"/>
+                                </svg>
+                              </i>
+                                <span class="item-name">Text Blast</span>
+                            </a>
+                        </li>
+                        @endif
                 </ul>
-                <!-- Sidebar Menu End -->        </div>
+            </div>
         </div>
         <div class="sidebar-footer"></div>
     </aside>   

@@ -342,7 +342,7 @@
 
         <form method="POST" action="{{ route('MoistureWorksheet.store', $rla->id) }}">
             @csrf
-
+             {{-- <input type="hidden" name="lab_code" value="{{ $labCodes[1] ?? '' }}"> --}}
             {{-- HIDDEN VALUES --}}
             <input type="hidden"
                 id="lf_06_02_id"
@@ -630,8 +630,9 @@
                             name="analyzed_by_2"
                             class="signature-select">
                             <option value="">Select User</option>
-
-                            @foreach($users as $user)
+                            <option value="MMAB">MMAB</option>
+                            <option value="AAAA">AAAA</option>
+                            {{-- @foreach($users as $user)
                                 @php
                                     $fullName = trim(
                                         ($user->f_name ?? '') . ' ' .
@@ -644,7 +645,7 @@
                                     {{ old('analyzed_by_2', $worksheet->analyzed_by_2 ?? '') == $fullName ? 'selected' : '' }}>
                                     {{ $fullName }}
                                 </option>
-                            @endforeach
+                            @endforeach --}}
                         </select>
                     </td>
 
@@ -655,8 +656,9 @@
                             name="checked_by"
                             class="signature-select">
                             <option value="">Select User</option>
-
-                            @foreach($users as $user)
+                            <option value="MMAB">MMAB</option>
+                            <option value="AAAA">AAAA</option>
+                            {{-- @foreach($users as $user)
                                 @php
                                     $fullName = trim(
                                         ($user->f_name ?? '') . ' ' .
@@ -669,7 +671,7 @@
                                     {{ old('checked_by', $worksheet->checked_by ?? '') == $fullName ? 'selected' : '' }}>
                                     {{ $fullName }}
                                 </option>
-                            @endforeach
+                            @endforeach --}}
                         </select>
                     </td>
                 </tr>

@@ -194,7 +194,7 @@
                                         border: none !important;
                                     }
                             </style>
-                            <a class="btn btn-sm btn-icon btn-success" style="margin-left:770px"
+                            {{-- <a class="btn btn-sm btn-icon btn-success" style="margin-left:770px"
                                 data-bs-toggle="modal"
                                 data-bs-target="#qrModal"
                                 title="Scan Equipment">
@@ -202,7 +202,7 @@
                               <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30" viewBox="0 0 30 30">
                                  <image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAACqUlEQVR4AcyXyctOURzHH0OmXmMKOztDJGRhXFiwpEQZwkq9CxQWhIxhIVKElMiUDP8AZUHGjFmRmQxlhUSKz+f0nqfzep577+a63rfv5/x+55x7fr97znPvPeftXPtPf2li/WXcx234At8TvuGfgi6QpYl0vIB0nP572k7CCKjLZFa6UlyAwzABWqBHQi/8BTAFsrSejqGQjtMfTNtCuAszISgmXkNtNuTpB52vIEtPsjra2ntiz8BAqJm4E85KiPqNcw62wpY2NmGnwkvI0lo6WiGO0e6i/hyi+uMshpB4CI7LgQk6SDkPTLYZK97EHfw8/aTzEHh9ZB31SeAzggkaZ+mMu+skXEv8MtyPBEl/hpDPxLS3k0vdrqGESkPMZolLyFMcolnihrsrDlN4RUNME79j2BtQvjL3dErmZhLvhr6JfRp98pbT4NfnKbZsrSLgUpgLeyG8Ttq3FPvhPvwLObnjBD4PYdmdsZ8xXyGXuAqOkbzFxCdwJsPYilhCnlYTp18V2irRVxO7Obj+fp+rYCNTO2Lihzg+cX6fq2A7+X6ZGFsbT7EPnD2mdLkrbSOqO5h7dHid3OQv07gCLoIPGaZUHSDaBtgJ2pB4EJV+oNybh+mUTBoz+HGpS85THK5DJc47SRZPpfkVDTGd8d8fkFmM9bfGlKLhREmPtiGfiT/R8Qyi3EE8ip6mwbO0+Fm1naZMDaBnN3h9xE3hFm3dIOq6jom1OywSfKXmU/csLYvwz8JIyJJJV9Pp9ZE51PtA1Gscbyq8Tvi1oxR7IE8uf++cC/rm9Nn1gcKfsb7U1IO82+l4LvED7OOER/iek1023KbyKHuJnnSc/lXaHDsKa1xMrT7jUKG4Av674VKPxo+MwfesjMmUR9gZ9MYx0U6jzbGfsXX9AQAA//8C8GoTAAAABklEQVQDANfVrj3uT8DjAAAAAElFTkSuQmCC" x="0" y="0" width="30" height="30"/>
                               </svg>
-                            </a>
+                            </a> --}}
                             <a class="btn btn-sm btn-icon btn-warning" data-bs-toggle="modal" data-bs-target="#addEquipmentModal"  data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Add Equipment" title="Add Equipment">
                                 <svg class="icon-32" width="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.5 12.5537C12.2546 12.5537 14.4626 10.3171 14.4626 7.52684C14.4626 4.73663 12.2546 2.5 9.5 2.5C6.74543 2.5 4.53737 4.73663 4.53737 7.52684C4.53737 10.3171 6.74543 12.5537 9.5 12.5537ZM9.5 15.0152C5.45422 15.0152 2 15.6621 2 18.2464C2 20.8298 5.4332 21.5 9.5 21.5C13.5448 21.5 17 20.8531 17 18.2687C17 15.6844 13.5668 15.0152 9.5 15.0152ZM19.8979 9.58786H21.101C21.5962 9.58786 22 9.99731 22 10.4995C22 11.0016 21.5962 11.4111 21.101 11.4111H19.8979V12.5884C19.8979 13.0906 19.4952 13.5 18.999 13.5C18.5038 13.5 18.1 13.0906 18.1 12.5884V11.4111H16.899C16.4027 11.4111 16 11.0016 16 10.4995C16 9.99731 16.4027 9.58786 16.899 9.58786H18.1V8.41162C18.1 7.90945 18.5038 7.5 18.999 7.5C19.4952 7.5 19.8979 7.90945 19.8979 8.41162V9.58786Z" fill="currentColor"></path></svg>                        
                             </a>
@@ -212,16 +212,18 @@
                                 <div class="modal-dialog modal-xl">
                                     <div class="modal-content">
                                     <div class="modal-header">
+                                          <h4>Add Items </h4>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
+                                      
                                         <form class="row g-3 needs-validation" action="{{ route('lf_03_05.store')}}" method="POST" novalidate>
                                             @csrf
                                             <div class="col-md-6 position-relative  mb-2">
-                                                <label for="equipment" class="form-label">Equipment</label>
+                                                <label for="equipment" class="form-label">Item</label>
                                                 <input type="text" class="form-control" id="equipment" required name="equipment">
                                                 <div class="invalid-tooltip">
-                                                    Please provide a Equipment.
+                                                    Please provide a Item.
                                                 </div>
                                                 <div class="valid-tooltip">
                                                     Looks good!
@@ -229,10 +231,10 @@
                                             </div>
 
                                             <div class="col-md-6 position-relative mb-2">
-                                                <label for="equipment_no" class="form-label">Equipment No.</label>
+                                                <label for="equipment_no" class="form-label">Item No.</label>
                                                 <input type="text" class="form-control" id="equipment_no" required name="equipment_no">
                                                 <div class="invalid-tooltip">
-                                                    Please provide a Equipment No.
+                                                    Please provide a Item No.
                                                 </div>
                                                 <div class="valid-tooltip">
                                                     Looks good!
@@ -269,8 +271,6 @@
                                                     <label for="year" class="form-label">Year</label>
                                                     <input type="number" class="form-control" id="year" readonly placeholder="YYYY">
                                                 </div>
-
-                                                <!-- Hidden inputs for actual submission -->
                                                 <input type="hidden" name="month" id="month_db">
                                                 <input type="hidden" name="year" id="year_db">
 
@@ -285,9 +285,9 @@
                                                 monthInput.addEventListener('input', () => {
                                                     if (monthInput.value) {
                                                         const [year, month] = monthInput.value.split('-');
-                                                        yearInput.value = year;       // display only
-                                                        monthDbInput.value = month;   // submit month only
-                                                        yearDbInput.value = year;     // submit year
+                                                        yearInput.value = year;       
+                                                        monthDbInput.value = month;   
+                                                        yearDbInput.value = year;     
                                                     } else {
                                                         yearInput.value = '';
                                                         monthDbInput.value = '';
@@ -295,28 +295,48 @@
                                                     }
                                                 });
                                                 </script>
-
-
                                             <div class="col-12 mt-4">
                                                 <button class="btn btn-success" type="submit">Submit</button>
-                                            </div>
-                                            
+                                            </div> 
                                         </form>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    
                                     </div>
                                     </div>
                                 </div>
                             </div>   
                         </div>
+                        <form method="GET" action="{{ url()->current() }}" class="row g-2 align-items-end mt-3">
+                            <div class="col-sm-3 " style="margin-left:4mm">
+                                <label for="filter_month" class="form-label">Month</label>
+                                <select id="filter_month" name="month" class="form-select">
+                                    <option value="">All months</option>
+                                    @foreach(['01' => 'January', '02' => 'February', '03' => 'March', '04' => 'April', '05' => 'May', '06' => 'June', '07' => 'July', '08' => 'August', '09' => 'September', '10' => 'October', '11' => 'November', '12' => 'December'] as $value => $label)
+                                        <option value="{{ $value }}" {{ (int) $value === $selectedMonth ? 'selected' : '' }}>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <label for="filter_year" class="form-label">Year</label>
+                                <select id="filter_year" name="year" class="form-select">
+                                    <option value="">All years</option>
+                                    @foreach($years as $year)
+                                        <option value="{{ $year }}" {{ (int) $year === $selectedYear ? 'selected' : '' }}>{{ $year }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-sm-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                                <a href="{{ url()->current() }}" class="btn btn-light">Clear</a>
+                            </div>
+                        </form>
                         <div class="table-responsive mt-3">
                                 <table id="user-list-table" class="table table-striped" role="grid" data-bs-toggle="data-table">
                                     <thead>
                                         <tr class="light">
-                                            <th>Equipment </th>
-                                            <th>Equipment No.</th>
+                                            <th>Item </th>
+                                            <th>Item No.</th>
                                             <th>Brand Model</th>
                                             <th>Location</th>
                                             <th>Month</th>
@@ -325,7 +345,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($equipments as $equipment)
+                                        @forelse($equipments as $equipment)
                                         <tr>
                                             <td>{{ $equipment->equipment }}</td>
                                             <td>{{ $equipment->equipment_no ?? 'N/A' }}</td>
@@ -368,12 +388,12 @@
                                                             </span>
                                                         </a> --}}
                                                     
-                                                    <a class="btn btn-sm btn-icon btn-success" data-bs-toggle="tooltip" data-bs-placement="top" data-original-title="Edit" href="{{ route('equipments_book.index', $equipment->id) }}" aria-label="Logs" data-bs-original-title="Logs">
+                                                    <a class="btn btn-sm btn-icon btn-success" data-bs-toggle="tooltip" data-bs-placement="top" data-original-title="Edit" href="{{ route('equipments_book.index', ['id' => $equipment->id, 'month' => $selectedMonth ?: null, 'year' => $selectedYear ?: null]) }}" aria-label="Logs" data-bs-original-title="Logs">
                                                         <span class="btn-inner">
                                                                                     <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">                            <path fill-rule="evenodd" clip-rule="evenodd" d="M7.81 2H16.191C19.28 2 21 3.78 21 6.83V17.16C21 20.26 19.28 22 16.191 22H7.81C4.77 22 3 20.26 3 17.16V6.83C3 3.78 4.77 2 7.81 2ZM8.08 6.66V6.65H11.069C11.5 6.65 11.85 7 11.85 7.429C11.85 7.87 11.5 8.22 11.069 8.22H8.08C7.649 8.22 7.3 7.87 7.3 7.44C7.3 7.01 7.649 6.66 8.08 6.66ZM8.08 12.74H15.92C16.35 12.74 16.7 12.39 16.7 11.96C16.7 11.53 16.35 11.179 15.92 11.179H8.08C7.649 11.179 7.3 11.53 7.3 11.96C7.3 12.39 7.649 12.74 8.08 12.74ZM8.08 17.31H15.92C16.319 17.27 16.62 16.929 16.62 16.53C16.62 16.12 16.319 15.78 15.92 15.74H8.08C7.78 15.71 7.49 15.85 7.33 16.11C7.17 16.36 7.17 16.69 7.33 16.95C7.49 17.2 7.78 17.35 8.08 17.31Z" fill="currentColor"></path>                            </svg>                        
                                                         </span>
                                                     </a>
-                                                <form action="{{ route('clients.delete', $equipment->id) }}" method="POST" class="delete-form d-inline">
+                                                <form action="{{ route('lf_03_05.delete', $equipment->id) }}" method="POST" class="delete-form d-inline">
                                                     @csrf
                                                     @method('DELETE')
 
@@ -425,7 +445,11 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        @endforeach
+                                        @empty
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4">No equipment found for the selected month and year.</td>
+                                        </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
                                 

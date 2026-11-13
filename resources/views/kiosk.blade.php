@@ -104,19 +104,15 @@ document.addEventListener('click', function once() {
 });
 </script> --}}
 <style>
-    
     /* html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
 } */
-
-
 </style>
     <style>
     body {
-        background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'><path fill='%23008000' fill-opacity='1' d='M0,64L60,101.3C120,139,240,213,360,250.7C480,288,600,288,720,250.7C840,213,960,139,1080,117.3C1200,96,1320,128,1380,144L1440,160L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z'></path></svg>")
-                    no-repeat bottom center;
+        background-color:rgb(255, 255, 255);
         background-size: cover;
     }
 </style>
@@ -160,47 +156,100 @@ document.addEventListener('click', function once() {
             <i class="fas fa-expand-arrows-alt"></i>
         </a>
        <main class="app-main">
-            <div class="app-content d-flex flex-column align-items-center" style="height: 80vh; margin-top:6%">
-                {{-- <div class="mb-5">
+            <div class="app-content d-flex flex-column align-items-center" style="height: 80vh; margin-top:3%">
+                <div class="mb-5">
                     <img
-                        src="{{ asset('adminlte/assets/img/logo.jpg')}}"
+                        src="{{ asset('assets/images/bfarlogo.png')}}"
                         alt="Logo"
-                        style="max-width:200px; display:block;"
+                        style="max-width:300px; display:block;margin-left:42%"
                     />
-                </div> --}}
+                </div>
+                
+                  <span style="color:rgb(0, 0, 0);margin-left:42%;font-size:8mm;margin-bottom:6mm">BFAR LAB GENSAN</span>
+                 
+                    <div class="kiosk-layout mt-5">
+                            <span style="margin-left:46%;font-size:5mm;color:rgb(12, 97, 16)"> REGION XII</span>
+                        <!-- LEFT: BUTTONS -->
+                        <div class="kiosk-container ">
+                            <div class="kiosk-row" style="margin-left:31%; margin-top:3%">
+                                <a href="/kiosk-form" class="kiosk-btn kiosk-bills" style="background-color:green">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span style="color:rgb(255, 255, 255)">FORM</span>
+                                </a>
 
-            <div class="kiosk-layout mt-5">
+                                <a href="/arta.create" class="kiosk-btn kiosk-concern" style="background-color:rgb(45, 0, 128)">
+                                    <i class="fas fa-headset"></i>
+                                    <span style="color:rgb(255, 255, 255)">SURVEY</span>
+                                </a>
+                            </div>
 
-                <!-- LEFT: BUTTONS -->
-                <div class="kiosk-container ">
-                    <div class="kiosk-row" style="margin-left:31%; margin-top:7%">
-                        <a href="/kiosk-form" class="kiosk-btn kiosk-bills">
-                            <i class="fas fa-credit-card"></i>
-                            <span style="color:blue">FORM</span>
-                        </a>
+                    
+                        </div>
 
-                        <a href="/arta.create" class="kiosk-btn kiosk-concern">
-                            <i class="fas fa-headset"></i>
-                            <span style="color:green">SURVEY</span>
-                        </a>
+                        <!-- RIGHT: VIDEO -->
+                        <div class="kiosk-video">
+                            <video autoplay muted loop playsinline>
+                                <source src="{{ asset('videos/kiosk.mp4') }}" type="video/mp4">
+                            </video>
+                        </div>
+
                     </div>
 
-             
-                </div>
-
-                <!-- RIGHT: VIDEO -->
-                <div class="kiosk-video">
-                    <video autoplay muted loop playsinline>
-                        <source src="{{ asset('videos/kiosk.mp4') }}" type="video/mp4">
-                    </video>
-                </div>
-
-            </div>
-
 
 
             </div>
+            <!-- Footer Scrolling Text -->
+                <div class="ticker-wrapper">
+                    <div class="ticker">
+                        <span>
+                            📢 WELCOME TO BFAR REGION XII LABORATORY KIOSK• 
+                            Please proceed to the FORM for laboratory requests. • 
+                            Kindly accomplish the ARTA SURVEY after your transaction. • 
+                            Thank you for choosing BFAR Region XII Laboratory Services. •
+                            ALL RIGHT RESERVED.
+                        </span>
+                    </div>
+                </div>
         </main>
+        <style>
+            .ticker-wrapper{
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: #003366;
+                color: #fff;
+                overflow: hidden;
+                height: 45px;
+                display: flex;
+                align-items: center;
+                z-index: 9999;
+                border-top: 3px solid #00c853;
+            }
+
+            .ticker{
+                white-space: nowrap;
+                display: inline-block;
+                padding-left: 100%;
+                animation: ticker 25s linear infinite;
+                font-size: 18px;
+                font-weight: bold;
+            }
+
+            .ticker span{
+                display: inline-block;
+                padding-right: 100px;
+            }
+
+            @keyframes ticker{
+                0%{
+                    transform: translateX(0);
+                }
+                100%{
+                    transform: translateX(-100%);
+                }
+            }
+            </style>
        <style>
         
         .kiosk-container {
@@ -244,11 +293,11 @@ document.addEventListener('click', function once() {
 
             text-decoration: none;
             background: #ffffff;
-            color: #000000;                 
+            color: #ffffff;                 
             font-size: 32px;
             font-weight: 800;
 
-            border: 4px solid #666666;  
+            border: 2px solid #666666;  
             box-shadow: 0 12px 30px rgba(37, 37, 37, 0.2);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
@@ -256,16 +305,16 @@ document.addEventListener('click', function once() {
         .kiosk-btn i {
             font-size: 80px;
             margin-bottom: 16px;
-            color: #000;                   
+            color: #ffffff;                   
             
-            border: 3px solid #1d1c1c;     
+            border: 2px solid #ffffff;     
             border-radius: 16px;
             padding: 16px 20px;
         }
 
         .kiosk-btn:hover {
             transform: scale(1.06);
-            box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+            box-shadow: 0 18px 40px rgba(90, 89, 89, 0.35);
         }
 
         .kiosk-bills,

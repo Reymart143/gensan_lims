@@ -366,7 +366,7 @@
                                 </div>
                             </div>
                             <a class="btn btn-success toolbar-button" data-bs-toggle="modal" data-bs-target="#addEquipmentModal" aria-label="Add Equipment" title="Add Equipment">
-                                Add Equipment
+                                Add Inventory
                             </a>
                         </div>
                         <div class="collapse mt-3" id="columnSelectorPanel">
@@ -515,7 +515,7 @@
     <div class="modal-dialog modal-xl modal-dialog-centered equipment-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addEquipmentModalLabel">Add New Equipment</h5>
+                <h5 class="modal-title" id="addEquipmentModalLabel">Add New Inventory</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -538,7 +538,7 @@
                         <div class="section-title">Source & Identification</div>
                         <div class="section-grid">
                             <div>
-                                <label for="equipment" class="form-label">Equipment *</label>
+                                <label for="equipment" class="form-label">Items *</label>
                                 <select class="form-select @error('equipment') is-invalid @enderror" id="equipment" name="equipment" required>
                                     <option value="">Select Equipment</option>
                                     @foreach($equipmentDropdown as $item)
@@ -551,7 +551,7 @@
                                 @error('equipment')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             </div>
                             <div>
-                                <label for="equipment_no" class="form-label">Equipment No. <span class="field-chip">Auto-generated</span></label>
+                                <label for="equipment_no" class="form-label">Item No. <span class="field-chip">Auto-generated</span></label>
                                 <input type="text" class="form-control readonly-field @error('equipment_no') is-invalid @enderror" id="equipment_no" name="equipment_no" value="{{ old('equipment_no') }}" readonly required data-bs-toggle="tooltip" title="Filled automatically from the selected source record.">
                                 @error('equipment_no')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             </div>
@@ -670,7 +670,7 @@
 
                     <div class="actions-row">
                         <button class="btn btn-success" id="saveEquipmentBtn" type="submit">
-                            <span class="save-label">Save Equipment</span>
+                            <span class="save-label">Save Inventory</span>
                             <span class="save-spinner spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
                         </button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -686,7 +686,7 @@
     <div class="modal-dialog modal-xl modal-dialog-centered equipment-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editEquipmentModalLabel">Update Equipment</h5>
+                <h5 class="modal-title" id="editEquipmentModalLabel">Update Inventory</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -712,7 +712,7 @@
                         <div class="section-title">Source & Identification</div>
                         <div class="section-grid">
                             <div>
-                                <label for="edit_equipment" class="form-label">Equipment *</label>
+                                <label for="edit_equipment" class="form-label">Items *</label>
                                 <select class="form-select @error('equipment') is-invalid @enderror" id="edit_equipment" name="equipment" required>
                                     <option value="">Select Equipment</option>
                                     @foreach($equipmentDropdown as $item)
@@ -725,7 +725,7 @@
                                 @error('equipment')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             </div>
                             <div>
-                                <label for="edit_equipment_no" class="form-label">Equipment No. <span class="field-chip">Auto-generated</span></label>
+                                <label for="edit_equipment_no" class="form-label">Item No. <span class="field-chip">Auto-generated</span></label>
                                 <input type="text" class="form-control readonly-field @error('equipment_no') is-invalid @enderror" id="edit_equipment_no" name="equipment_no" value="{{ old('equipment_no') }}" readonly required data-bs-toggle="tooltip" title="Filled automatically from the selected source record.">
                                 @error('equipment_no')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             </div>
@@ -846,7 +846,7 @@
 
                     <div class="actions-row">
                         <button class="btn btn-success" id="editSaveEquipmentBtn" type="submit">
-                            <span class="save-label">Update Equipment</span>
+                            <span class="save-label">Update Inventory</span>
                             <span class="save-spinner spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
                         </button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

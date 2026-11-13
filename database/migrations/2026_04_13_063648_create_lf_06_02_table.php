@@ -34,6 +34,8 @@ return new class extends Migration
             $table->integer('status')->default(0);
             $table->string('terms_accepted')->nullable();
             $table->json('report_test_no')->nullable();
+            $table->string('retrieve_sample')->nullable();
+            $table->date('release_date')->nullable();
             $table->timestamps();
         });
     }

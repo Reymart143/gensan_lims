@@ -33,7 +33,7 @@
     }
 
     function wbVal($array, $index, $default = '') {
-        return isset($array[$index]) && $array[$index] !== null && $array[$index] !== ''
+        return isset($array[$index]) && $array[$index] !== ''
             ? $array[$index]
             : $default;
     }
@@ -50,42 +50,80 @@
         }
     }
 
-    $labCodes = wbJson($rla->laboratory_code ?? null);
-    $firstLabCode = $labCodes[0] ?? '';
+    /*
+    |--------------------------------------------------------------------------
+    | Get selected laboratory code index
+    |--------------------------------------------------------------------------
+    */
 
-    $sampleDescriptions = wbJson($rla->sample_description ?? null);
-    $firstSampleDescription = $sampleDescriptions[0] ?? '';
+    $labCodes = wbJson($rla->laboratory_code);
 
-    $analysisRequested = wbFlatten(wbJson($rla->analysis_requested ?? null));
+    $selectedLabCode = $selectedLabCode ?? request('laboratory_code');
 
-    $testName = $worksheet ? wbJson($worksheet->test_name ?? null) : [];
+    $index = array_search($selectedLabCode, $labCodes);
 
-    $d100r1 = $worksheet ? wbJson($worksheet->dilution_100_r1 ?? null) : [];
-    $d100r2 = $worksheet ? wbJson($worksheet->dilution_100_r2 ?? null) : [];
+    if ($index === false) {
+        $index = 0;
+    }
 
-    $d101r1 = $worksheet ? wbJson($worksheet->dilution_101_r1 ?? null) : [];
-    $d101r2 = $worksheet ? wbJson($worksheet->dilution_101_r2 ?? null) : [];
+    /*
+    |--------------------------------------------------------------------------
+    | Per laboratory code values
+    |--------------------------------------------------------------------------
+    */
 
-    $d102r1 = $worksheet ? wbJson($worksheet->dilution_102_r1 ?? null) : [];
-    $d102r2 = $worksheet ? wbJson($worksheet->dilution_102_r2 ?? null) : [];
+    $sampleDescriptions = wbJson($rla->sample_description);
+    $analysisRequested  = wbJson($rla->analysis_requested);
 
-    $d103r1 = $worksheet ? wbJson($worksheet->dilution_103_r1 ?? null) : [];
-    $d103r2 = $worksheet ? wbJson($worksheet->dilution_103_r2 ?? null) : [];
+    $firstLabCode = $labCodes[$index] ?? '';
 
-    $results = $worksheet ? wbJson($worksheet->results ?? null) : [];
+    $firstSampleDescription = $sampleDescriptions[$index] ?? '';
 
-    $fallbackTests = [
-        'Total Vibrio Colonies',
-        'Total Luminous Bacteria',
-        '%Yellow Colonies',
-        '%Green Colonies',
-    ];
+    $selectedAnalysis = $analysisRequested[$index] ?? [];
 
-    $displayTests = count($analysisRequested) > 0
-        ? $analysisRequested
-        : $fallbackTests;
+    if (!is_array($selectedAnalysis)) {
+        $selectedAnalysis = [$selectedAnalysis];
+    }
 
-    $rowCount = max(count($displayTests), count($testName));
+    /*
+    |--------------------------------------------------------------------------
+    | Worksheet JSON
+    |--------------------------------------------------------------------------
+    */
+
+    $testName = $worksheet ? wbJson($worksheet->test_name) : [];
+
+    $d100r1 = $worksheet ? wbJson($worksheet->dilution_100_r1) : [];
+    $d100r2 = $worksheet ? wbJson($worksheet->dilution_100_r2) : [];
+
+    $d101r1 = $worksheet ? wbJson($worksheet->dilution_101_r1) : [];
+    $d101r2 = $worksheet ? wbJson($worksheet->dilution_101_r2) : [];
+
+    $d102r1 = $worksheet ? wbJson($worksheet->dilution_102_r1) : [];
+    $d102r2 = $worksheet ? wbJson($worksheet->dilution_102_r2) : [];
+
+    $d103r1 = $worksheet ? wbJson($worksheet->dilution_103_r1) : [];
+    $d103r2 = $worksheet ? wbJson($worksheet->dilution_103_r2) : [];
+
+    $results = $worksheet ? wbJson($worksheet->results) : [];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Since one laboratory code = one worksheet
+    |--------------------------------------------------------------------------
+    */
+
+    $displayTests = count($selectedAnalysis)
+        ? $selectedAnalysis
+        : [
+            'Total Vibrio Colonies',
+            'Total Luminous Bacteria',
+            '%Yellow Colonies',
+            '%Green Colonies'
+        ];
+
+    // dili na dependent sa number of laboratory code
+    $rowCount = count($displayTests);
 
     $dateStarted = old('date_started', wbDateValue($worksheet->date_started ?? ''));
     $dateFinished = old('date_finished', wbDateValue($worksheet->date_finished ?? ''));
@@ -435,7 +473,7 @@
 
 <form action="{{ route('water_bacteriology_worksheet.store', $rla->id) }}" method="POST">
     @csrf
-
+    <input type="hidden" name="lab_code" value="{{ $selectedLabCode }}">
     <input type="hidden" name="user_id" value="{{ $rla->user_id }}">
     <input type="hidden" name="rla_no" value="{{ $rla->RLA_no }}">
 
@@ -529,25 +567,25 @@
                             <input type="text"
                                    name="lab_code"
                                    class="input-cell"
-                                   value="{{ old('lab_code', $worksheet->lab_code ?? $firstLabCode) }}">
+                                   value="{{ old('lab_code', $worksheet->lab_code ?? $selectedLabCode ) }}">
                         </td>
 
                         <td colspan="3" class="info-cell">
                             <label for="date_started"><b>Date Started:</b></label>
-                            <input type="date"
-                                   id="date_started"
-                                   name="date_started"
-                                   class="date-input"
-                                   value="{{ old('date_started', $dateStarted) }}">
+                            <input type="datetime-local"
+                                id="date_started"
+                                name="date_started"
+                                class="date-input"
+                                value="{{ old('date_started', !empty($dateStarted) ? \Carbon\Carbon::parse($dateStarted)->format('Y-m-d\TH:i') : '') }}">
                         </td>
 
                         <td colspan="3" class="info-cell">
                             <label for="date_finished"><b>Date Finished:</b></label>
-                            <input type="date"
-                                   id="date_finished"
-                                   name="date_finished"
-                                   class="date-input"
-                                   value="{{ old('date_finished', $dateFinished) }}">
+                            <input type="datetime-local"
+                                id="date_finished"
+                                name="date_finished"
+                                class="date-input"
+                                value="{{ old('date_finished', !empty($dateFinished) ? \Carbon\Carbon::parse($dateFinished)->format('Y-m-d\TH:i') : '') }}">
                         </td>
                     </tr>
 
@@ -695,10 +733,236 @@
 
                 {{-- CALCULATIONS --}}
                 <div class="calculations-box">
-                    <div class="calculations-title">CALCULATIONS</div>
-                    <textarea name="calculations" class="calculations-textarea">{{ old('calculations', $worksheet->calculations ?? '') }}</textarea>
-                </div>
+                            <div class="calculations-title">CALCULATIONS</div>
 
+                            <textarea
+                                name="calculations"
+                                id="calculations"
+                                class="calculations-textarea"
+                                readonly>{{ old('calculations', $worksheet->calculations ?? '') }}</textarea>
+                        </div>
+                <script>
+                                function val(name, index){
+
+                    const input = document.querySelectorAll(`input[name="${name}[]"]`)[index];
+
+                    if(!input) return 0;
+
+                    let v = parseFloat(input.value);
+
+                    return isNaN(v) ? 0 : v;
+                }
+
+
+                // ================================
+                // SCIENTIFIC FORMAT FUNCTION
+                // ================================
+
+                function scientificFormat(value){
+
+                    if(value === 0){
+                        return "0";
+                    }
+
+
+                    let exponent = Math.floor(Math.log10(value));
+
+                    let coefficient = value / Math.pow(10, exponent);
+
+
+                    let superscript = {
+                        "0":"⁰",
+                        "1":"¹",
+                        "2":"²",
+                        "3":"³",
+                        "4":"⁴",
+                        "5":"⁵",
+                        "6":"⁶",
+                        "7":"⁷",
+                        "8":"⁸",
+                        "9":"⁹"
+                    };
+
+
+                    let expText = exponent
+                        .toString()
+                        .split("")
+                        .map(x => superscript[x])
+                        .join("");
+
+
+                    return coefficient.toFixed(1) + " × 10" + expText;
+
+                }
+
+                function computeCalculation(){
+
+                    let tlbcR1 = val('dilution_100_r1',0);
+
+                    let tlbcR2 = val('dilution_100_r2',0);
+
+
+                    let tlbcAve = (tlbcR1 + tlbcR2) / 2;
+
+
+                    let tlbc = tlbcAve / 0.1;
+
+
+                    let yc1 = val('dilution_100_r1',2);
+
+                    let yc2 = val('dilution_100_r2',2);
+
+
+                    let gc1 = val('dilution_100_r1',3);
+
+                    let gc2 = val('dilution_100_r2',3);
+
+
+
+                    let tvcAve = (yc1 + yc2 + gc1 + gc2) / 2;
+
+
+                    let tvc = tvcAve / 0.1;
+
+
+                    let ycAve = (yc1 + yc2) / 2;
+
+
+                    let percentYC = 0;
+
+
+                    if(tvcAve > 0){
+
+                        percentYC = (ycAve / tvcAve) * 100;
+
+                    }
+
+
+                    let percentGC = 100 - percentYC;
+
+
+
+
+                    const resultInputs = document.querySelectorAll('input[name="results[]"]');
+
+
+                    if(resultInputs.length >= 4){
+
+
+                        // TLBC
+                        resultInputs[0].value = scientificFormat(tlbc);
+
+
+                        // TVC
+                        resultInputs[1].value = scientificFormat(tvc);
+
+
+                        // Yellow Colonies
+                        resultInputs[2].value = Math.round(percentYC) + " %";
+
+
+                        // Green Colonies
+                        resultInputs[3].value = Math.round(percentGC) + " %";
+
+
+                    }
+
+
+
+
+
+                    // =========================
+                    // CALCULATION TEXT
+                    // =========================
+
+
+                    let text = "";
+
+
+                    text += "1. TOTAL VIBRIO COUNT (TVC)\n\n";
+
+
+                    text += `(${yc1} + ${yc2} + ${gc1} + ${gc2}) / 2\n`;
+
+                    text += `= ${tvcAve.toFixed(2)}\n`;
+
+                    text += `${tvcAve.toFixed(2)} / 0.1 × 10⁰\n`;
+
+                    text += `= ${scientificFormat(tvc)}\n\n`;
+
+
+
+
+                    text += "2. TOTAL LUMINOUS BACTERIAL COUNT (TLBC)\n\n";
+
+
+                    text += `(${tlbcR1} + ${tlbcR2}) / 2\n`;
+
+                    text += `= ${tlbcAve.toFixed(2)}\n`;
+
+                    text += `${tlbcAve.toFixed(2)} / 0.1 × 10⁰\n`;
+
+                    text += `= ${scientificFormat(tlbc)}\n\n`;
+
+
+
+
+                    text += "3. % YELLOW COLONIES\n\n";
+
+
+                    text += `${ycAve.toFixed(2)} / ${tvcAve.toFixed(2)} ×100\n`;
+
+                    text += `= ${Math.round(percentYC)} %\n\n`;
+
+
+
+
+
+                    text += "4. % GREEN COLONIES\n\n";
+
+
+                    text += `100 - ${Math.round(percentYC)}\n`;
+
+                    text += `= ${Math.round(percentGC)} %`;
+
+
+
+
+                    document.getElementById("calculations").value = text;
+
+
+
+                }
+
+
+
+
+
+                // =========================
+                // AUTO COMPUTE
+                // =========================
+
+
+                document.querySelectorAll('input').forEach(function(el){
+
+
+                    el.addEventListener('keyup', computeCalculation);
+
+
+                    el.addEventListener('change', computeCalculation);
+
+
+                });
+
+
+
+
+                // =========================
+                // LOAD COMPUTATION
+                // =========================
+
+                computeCalculation();
+                    </script>
                 {{-- SIGNATURE --}}
                 <table class="wb-table signature-table">
                     <tr>
@@ -714,7 +978,9 @@
                         <td>
                             <select name="analyzed_by" class="signature-select">
                                 <option value="">Select Analyst</option>
-                                @foreach($users as $user)
+                                 <option value="C2LS">C2LS</option>
+                                <option value="EGBJ">EGBJ</option>
+                                {{-- @foreach($users as $user)
                                     @php
                                         $fullName = trim(($user->f_name ?? '') . ' ' . ($user->m_name ?? '') . ' ' . ($user->l_name ?? ''));
                                     @endphp
@@ -723,7 +989,7 @@
                                         {{ old('analyzed_by', $worksheet->analyzed_by ?? '') == $fullName ? 'selected' : '' }}>
                                         {{ $fullName }}
                                     </option>
-                                @endforeach
+                                @endforeach --}}
                             </select>
 
                             <div class="signature-label">
@@ -734,7 +1000,9 @@
                         <td>
                             <select name="checked_by" class="signature-select">
                                 <option value="">Select Checker</option>
-                                @foreach($users as $user)
+                                 <option value="C2LS">C2LS</option>
+                                <option value="EGBJ">EGBJ</option>
+                                {{-- @foreach($users as $user)
                                     @php
                                         $fullName = trim(($user->f_name ?? '') . ' ' . ($user->m_name ?? '') . ' ' . ($user->l_name ?? ''));
                                     @endphp
@@ -743,7 +1011,7 @@
                                         {{ old('checked_by', $worksheet->checked_by ?? '') == $fullName ? 'selected' : '' }}>
                                         {{ $fullName }}
                                     </option>
-                                @endforeach
+                                @endforeach --}}
                             </select>
 
                             <div class="signature-label">

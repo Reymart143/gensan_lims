@@ -29,125 +29,87 @@
                         </div>
                         <div class="card-body ">
                           <form method="GET">
-
                                 <div class="row mb-4">
-
                                     <div class="col-md-3">
                                         <label>Year</label>
-
                                         <select name="year" class="form-control">
-
                                             <option value="">All</option>
-
                                             @for($y=date('Y');$y>=2020;$y--)
                                                 <option value="{{ $y }}"
                                                     {{ request('year') == $y ? 'selected' : '' }}>
                                                     {{ $y }}
                                                 </option>
                                             @endfor
-
                                         </select>
                                     </div>
-
                                     <div class="col-md-3">
                                         <label>Month</label>
-
                                         <select name="month" class="form-control">
-
                                             <option value="">All</option>
-
                                             @for($m=1;$m<=12;$m++)
                                                 <option value="{{ $m }}"
                                                     {{ request('month') == $m ? 'selected' : '' }}>
                                                     {{ date('F',mktime(0,0,0,$m,1)) }}
                                                 </option>
                                             @endfor
-
                                         </select>
                                     </div>
-
                                     <div class="col-md-2">
                                         <label>&nbsp;</label>
-
                                         <button class="btn btn-success w-100">
                                             Filter
                                         </button>
                                     </div>
-
                                 </div>
-
                             </form>
                             <div class="card border-0 shadow-sm mb-4">
                                 <div class="card-body">
-
                                     <h6 class="text-muted">
                                         Total Registered Customers
                                     </h6>
-
                                     <h1 class="text-success">
                                         {{ number_format($totalCustomers) }}
                                     </h1>
-
                                 </div>
                             </div>
                             <div class="table-responsive">
-
-                                        <table class="table table-bordered table-hover">
-
-                                            <thead class="table-light">
-
-                                                <tr>
-                                                    <th>Customer Name</th>
-                                                    <th>Address</th>
-                                                    <th>Contact Number</th>
-                                                    <th>Date Registered</th>
-                                                </tr>
-
-                                            </thead>
-
-                                            <tbody>
-
-                                                @forelse($customers as $customer)
-
-                                                <tr>
-
-                                                    <td>
-                                                        {{ $customer->company_name }}
-                                                    </td>
-
-                                                    <td>{{ $customer->resolved_address }}</td>
-
-                                                    <td>
-                                                        {{ $customer->contact_no }}
-                                                    </td>
-
-                                                    <td>
-                                                        {{ \Carbon\Carbon::parse($customer->created_at)->format('M d, Y') }}
-                                                    </td>
-
-                                                </tr>
-
-                                                @empty
-
-                                                <tr>
-                                                    <td colspan="4" class="text-center">
-                                                        No records found.
-                                                    </td>
-                                                </tr>
-
-                                                @endforelse
-
-                                            </tbody>
-
-                                        </table>
-
-                                        </div>
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Customer Name</th>
+                                            <th>Address</th>
+                                            <th>Contact Number</th>
+                                            <th>Date Registered</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($customers as $customer)
+                                        <tr>
+                                            <td>
+                                                {{ $customer->company_name }}
+                                            </td>
+                                            <td>{{ $customer->resolved_address }}</td>
+                                            <td>
+                                                {{ $customer->contact_no }}
+                                            </td>
+                                            <td>
+                                                {{ \Carbon\Carbon::parse($customer->created_at)->format('M d, Y') }}
+                                            </td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="4" class="text-center">
+                                                No records found.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-   
- 
-    </div>
 
 
 @endsection

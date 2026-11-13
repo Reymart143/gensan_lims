@@ -210,9 +210,9 @@
                                 </span>
                             </a>
                         </div>
+                        
                         <div class="card-body ">
-                            <input type="text" id="searchInput" style="width: 50%"  placeholder="Search Document Code or Title" class="form-control mb-3">
-                            
+                           
 
                             <div class="table-responsive">
                                <style>
@@ -260,6 +260,9 @@
                                         }
                                     </style>
 
+                                    <div class="mb-3">
+                                        <input type="search" class="form-control" style="max-width: 520px" data-table-search="#documentsTable" placeholder="Search RLA, laboratory code, or customer">
+                                    </div>
                                     <div class="table-responsive">
 
                                         <table id="documentsTable"
@@ -281,6 +284,7 @@
                                                     <th>Official Receipt No.</th>
                                                     <th>Date Released</th>
                                                     <th>Released To</th>
+                                                    <th>Customer Signature</th>
                                                 </tr>
                                             </thead>
 
@@ -302,22 +306,16 @@
                                             </td>
 
                                             {{-- SAMPLE CODE --}}
-                                            <td class="multi-line">
-                                                @if (!empty($r->sample_code) && count($r->sample_code) > 0)
-                                                    @foreach ($r->sample_code as $code)
-                                                        {{ $code }} <br>
-                                                    @endforeach
-                                                @endif
-                                            </td>
+                                          <td class="multi-line">
+                                            @foreach($r->sample_code as $code)
+                                                {{ $code }} <br>
+                                            @endforeach
+                                        </td>
 
                                             {{-- LABORATORY CODE --}}
-                                            <td class="multi-line">
-                                                @if (!empty($r->laboratory_code) && count($r->laboratory_code) > 0)
-                                                    @foreach ($r->laboratory_code as $code)
-                                                        {{ $code }} <br>
-                                                    @endforeach
-                                                @endif
-                                            </td>
+                                          <td class="multi-line">
+                                            {{ $r->laboratory_code ?? '' }}
+                                        </td>
 
                                             <td>{{ $r->sample_received_by ?? '' }}</td>
 
@@ -351,10 +349,462 @@
                                                     : '' }}
                                             </td>
 
-                                            <td>{{ $r->sample_received_by ?? '' }}</td>
+                                          <td>
+                                                {{ $r->company_name }}
+                                            </td>
 
-                                        
+                                            <td class="text-center">
 
+                                            @if (!empty($r->customer_signature))
+
+                                                <img src="{{ $r->customer_signature }}"
+                                                    style="max-width:120px; max-height:60px;"
+                                                    alt="Customer Signature">
+
+                                                <br>
+
+                                                <button type="button"
+                                                        class="btn btn-sm btn-warning mt-2 signLabBtn"
+                                                        data-id="{{ $r->id }}"
+                                                        data-lab-code="{{ $r->laboratory_code }}">
+                                                        <i class="bi bi-pencil-square"></i> 
+                                                </button>
+
+                                            @else
+
+                                                <button type="button"
+                                                        class="btn btn-sm btn-primary signLabBtn"
+                                                        data-id="{{ $r->id }}"
+                                                        data-lab-code="{{ $r->laboratory_code }}">
+                                                    Sign
+                                                </button>
+
+                                            @endif
+                                                <div class="modal fade" id="signatureModal" tabindex="-1">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">
+                                                                    Customer Signature
+                                                                </h5>
+
+                                                                <button type="button"
+                                                                        class="btn-close"
+                                                                        data-bs-dismiss="modal">
+                                                                </button>
+                                                            </div>
+
+                                                            <div class="modal-body">
+
+                                                                <input type="hidden"
+                                                                    id="signatureRlaId">
+
+                                                                <input type="hidden"
+                                                                    id="signatureLabCode">
+
+                                                                <div class="mb-2">
+                                                                    Laboratory Code:
+                                                                    <strong id="signatureLabCodeDisplay"></strong>
+                                                                </div>
+
+                                                                <canvas
+                                                                    id="signature-pad"
+                                                                    style="
+                                                                        border:1px solid #ccc;
+                                                                        width:100%;
+                                                                        height:200px;
+                                                                        touch-action:none;
+                                                                    ">
+                                                                </canvas>
+
+                                                            </div>
+
+                                                            <div class="modal-footer">
+
+                                                                <button type="button"
+                                                                        class="btn btn-secondary"
+                                                                        id="clearSignature">
+                                                                    Clear
+                                                                </button>
+
+                                                                <button type="button"
+                                                                        class="btn btn-primary"
+                                                                        id="saveSignature">
+                                                                    Save Signature
+                                                                </button>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <script>
+                                                    $(document).ready(function () {
+
+                                                        let signaturePad = null;
+                                                        let isSavingSignature = false;
+
+
+                                                        /*
+                                                        |--------------------------------------------------------------------------
+                                                        | SIGN BUTTON - OPEN MODAL
+                                                        |--------------------------------------------------------------------------
+                                                        */
+                                                        $(document)
+                                                            .off('click.signature', '.signLabBtn')
+                                                            .on('click.signature', '.signLabBtn', function (e) {
+
+                                                                e.preventDefault();
+
+                                                                const rlaId = $(this).data('id');
+                                                                const labCode = $(this).data('lab-code');
+
+                                                                $('#signatureRlaId').val(rlaId);
+                                                                $('#signatureLabCode').val(labCode);
+                                                                $('#signatureLabCodeDisplay').text(labCode);
+
+                                                                const modalElement =
+                                                                    document.getElementById('signatureModal');
+
+                                                                const modal =
+                                                                    bootstrap.Modal.getOrCreateInstance(
+                                                                        modalElement
+                                                                    );
+
+                                                                modal.show();
+                                                            });
+
+
+                                                        /*
+                                                        |--------------------------------------------------------------------------
+                                                        | INITIALIZE SIGNATURE PAD
+                                                        |--------------------------------------------------------------------------
+                                                        */
+                                                        $('#signatureModal')
+                                                            .off('shown.bs.modal.signature')
+                                                            .on('shown.bs.modal.signature', function () {
+
+                                                                const canvas =
+                                                                    document.getElementById('signature-pad');
+
+                                                                if (!canvas) {
+                                                                    return;
+                                                                }
+
+                                                                const ratio =
+                                                                    Math.max(
+                                                                        window.devicePixelRatio || 1,
+                                                                        1
+                                                                    );
+
+                                                                canvas.width =
+                                                                    canvas.offsetWidth * ratio;
+
+                                                                canvas.height =
+                                                                    200 * ratio;
+
+                                                                const context =
+                                                                    canvas.getContext('2d');
+
+                                                                context.setTransform(
+                                                                    ratio,
+                                                                    0,
+                                                                    0,
+                                                                    ratio,
+                                                                    0,
+                                                                    0
+                                                                );
+
+                                                                /*
+                                                                |--------------------------------------------------------------------------
+                                                                | Remove old SignaturePad instance
+                                                                |--------------------------------------------------------------------------
+                                                                */
+                                                                if (signaturePad) {
+                                                                    signaturePad.off();
+                                                                }
+
+                                                                signaturePad =
+                                                                    new SignaturePad(canvas);
+
+                                                                signaturePad.clear();
+                                                            });
+
+
+                                                        /*
+                                                        |--------------------------------------------------------------------------
+                                                        | CLEAR SIGNATURE
+                                                        |--------------------------------------------------------------------------
+                                                        */
+                                                        $('#clearSignature')
+                                                            .off('click.signature')
+                                                            .on('click.signature', function (e) {
+
+                                                                e.preventDefault();
+
+                                                                if (signaturePad) {
+                                                                    signaturePad.clear();
+                                                                }
+                                                            });
+
+
+                                                        /*
+                                                        |--------------------------------------------------------------------------
+                                                        | SAVE SIGNATURE
+                                                        |--------------------------------------------------------------------------
+                                                        */
+                                                        $('#saveSignature')
+                                                            .off('click.signature')
+                                                            .on('click.signature', function (e) {
+
+                                                                e.preventDefault();
+
+
+                                                                /*
+                                                                |--------------------------------------------------------------------------
+                                                                | Prevent duplicate AJAX request
+                                                                |--------------------------------------------------------------------------
+                                                                */
+                                                                if (isSavingSignature) {
+                                                                    return;
+                                                                }
+
+
+                                                                /*
+                                                                |--------------------------------------------------------------------------
+                                                                | Check Signature
+                                                                |--------------------------------------------------------------------------
+                                                                */
+                                                                if (
+                                                                    !signaturePad ||
+                                                                    signaturePad.isEmpty()
+                                                                ) {
+
+                                                                    Swal.fire({
+                                                                        icon: 'warning',
+                                                                        title: 'Signature Required',
+                                                                        text: 'Please provide your signature.',
+                                                                        confirmButtonText: 'OK'
+                                                                    });
+
+                                                                    return;
+                                                                }
+
+
+                                                                const rlaId =
+                                                                    $('#signatureRlaId').val();
+
+                                                                const labCode =
+                                                                    $('#signatureLabCode').val();
+
+                                                                const signature =
+                                                                    signaturePad.toDataURL('image/png');
+
+                                                                const saveButton =
+                                                                    $(this);
+
+
+                                                                /*
+                                                                |--------------------------------------------------------------------------
+                                                                | Lock saving
+                                                                |--------------------------------------------------------------------------
+                                                                */
+                                                                isSavingSignature = true;
+
+                                                                saveButton
+                                                                    .prop('disabled', true)
+                                                                    .text('Saving...');
+
+
+                                                                /*
+                                                                |--------------------------------------------------------------------------
+                                                                | AJAX SAVE
+                                                                |--------------------------------------------------------------------------
+                                                                */
+                                                                $.ajax({
+
+                                                                    url:
+                                                                        "{{ route('releasing.signature.save') }}",
+
+                                                                    type:
+                                                                        "POST",
+
+                                                                    data: {
+
+                                                                        _token:
+                                                                            "{{ csrf_token() }}",
+
+                                                                        rla_id:
+                                                                            rlaId,
+
+                                                                        laboratory_code:
+                                                                            labCode,
+
+                                                                        signature:
+                                                                            signature
+                                                                    },
+
+
+                                                                    /*
+                                                                    |--------------------------------------------------------------------------
+                                                                    | SUCCESS
+                                                                    |--------------------------------------------------------------------------
+                                                                    */
+                                                                    success: function (response) {
+
+                                                                        if (response.status) {
+
+                                                                            /*
+                                                                            |--------------------------------------------------------------------------
+                                                                            | Close Modal
+                                                                            |--------------------------------------------------------------------------
+                                                                            */
+                                                                            const modalElement =
+                                                                                document.getElementById(
+                                                                                    'signatureModal'
+                                                                                );
+
+                                                                            const modal =
+                                                                                bootstrap.Modal.getInstance(
+                                                                                    modalElement
+                                                                                );
+
+                                                                            if (modal) {
+                                                                                modal.hide();
+                                                                            }
+
+
+                                                                            /*
+                                                                            |--------------------------------------------------------------------------
+                                                                            | ONE SUCCESS SWAL
+                                                                            |--------------------------------------------------------------------------
+                                                                            */
+                                                                            Swal.fire({
+                                                                                icon: 'success',
+                                                                                title: 'Signature Saved!',
+                                                                                text:
+                                                                                    response.message ||
+                                                                                    'Customer signature has been saved successfully.',
+                                                                                confirmButtonText: 'OK',
+                                                                                allowOutsideClick: false,
+                                                                                allowEscapeKey: false
+                                                                            }).then(function () {
+
+                                                                                window.location.reload();
+
+                                                                            });
+
+                                                                        } else {
+
+                                                                            Swal.fire({
+                                                                                icon: 'error',
+                                                                                title: 'Unable to Save',
+                                                                                text:
+                                                                                    response.message ||
+                                                                                    'Unable to save the signature.',
+                                                                                confirmButtonText: 'OK'
+                                                                            });
+                                                                        }
+                                                                    },
+
+
+                                                                    /*
+                                                                    |--------------------------------------------------------------------------
+                                                                    | ERROR
+                                                                    |--------------------------------------------------------------------------
+                                                                    */
+                                                                    error: function (xhr) {
+
+                                                                        console.log(
+                                                                            xhr.responseText
+                                                                        );
+
+                                                                        let message =
+                                                                            'An error occurred while saving the signature.';
+
+
+                                                                        if (
+                                                                            xhr.responseJSON &&
+                                                                            xhr.responseJSON.message
+                                                                        ) {
+
+                                                                            message =
+                                                                                xhr.responseJSON.message;
+                                                                        }
+
+
+                                                                        /*
+                                                                        |--------------------------------------------------------------------------
+                                                                        | Laravel Validation Errors
+                                                                        |--------------------------------------------------------------------------
+                                                                        */
+                                                                        if (
+                                                                            xhr.responseJSON &&
+                                                                            xhr.responseJSON.errors
+                                                                        ) {
+
+                                                                            const errors =
+                                                                                xhr.responseJSON.errors;
+
+                                                                            const firstError =
+                                                                                Object.values(errors)[0];
+
+                                                                            if (
+                                                                                Array.isArray(firstError) &&
+                                                                                firstError.length > 0
+                                                                            ) {
+
+                                                                                message =
+                                                                                    firstError[0];
+                                                                            }
+                                                                        }
+
+
+                                                                        Swal.fire({
+                                                                            icon: 'error',
+                                                                            title: 'Error',
+                                                                            text: message,
+                                                                            confirmButtonText: 'OK'
+                                                                        });
+                                                                    },
+
+
+                                                                    /*
+                                                                    |--------------------------------------------------------------------------
+                                                                    | COMPLETE
+                                                                    |--------------------------------------------------------------------------
+                                                                    */
+                                                                    complete: function () {
+
+                                                                        isSavingSignature = false;
+
+                                                                        saveButton
+                                                                            .prop('disabled', false)
+                                                                            .text('Save Signature');
+                                                                    }
+                                                                });
+                                                            });
+
+
+                                                        /*
+                                                        |--------------------------------------------------------------------------
+                                                        | DOWNLOAD PDF
+                                                        |--------------------------------------------------------------------------
+                                                        */
+                                                        $('#downloadPdfBtn')
+                                                            .off('click.releasingPdf')
+                                                            .on('click.releasingPdf', function (e) {
+
+                                                                e.preventDefault();
+
+                                                                window.location.href =
+                                                                    "{{ route('releasing.download.pdf') }}";
+                                                            });
+
+                                                    });
+                                                    </script>
+                                        </td>
                                         </tr>
                                     @endforeach
                                     </tbody>
@@ -375,7 +825,7 @@
    
  
     </div>
-<div class="modal fade" id="signatureModal" tabindex="-1">
+{{-- <div class="modal fade" id="signatureModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
@@ -464,6 +914,6 @@
     });
 
 });
-    </script>
+    </script> --}}
 
 @endsection

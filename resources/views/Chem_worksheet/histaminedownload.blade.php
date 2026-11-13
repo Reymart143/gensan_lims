@@ -164,6 +164,17 @@
 
     $laboratoryCodes = hJson($rla->laboratory_code ?? null);
 
+    // Keep the reagent blank and only the requested sample in this PDF.
+    $selectedSampleIndex = array_search($selectedLabCode ?? '', $sampleLabCode, true);
+    if ($selectedSampleIndex === false) {
+        $rlaCodeIndex = array_search($selectedLabCode ?? '', $laboratoryCodes, true);
+        $selectedSampleIndex = $rlaCodeIndex === false ? null : $rlaCodeIndex + 1;
+    }
+    $sampleRows = [0];
+    if ($selectedSampleIndex !== null && $selectedSampleIndex > 0) {
+        $sampleRows[] = $selectedSampleIndex;
+    }
+
     $defaultTargets = ['Blank', '0.01', '0.05', '0.10', '0.20', '0.30'];
 
     $qcDefaultLabels = [
@@ -175,7 +186,6 @@
         ''
     ];
 
-    $sampleRowCount = max(count($sampleLabCode), count($laboratoryCodes) + 1, 10);
 @endphp
 
 <table>
@@ -349,7 +359,7 @@
         </tr>
     </thead>
     <tbody>
-        @for($i = 0; $i < $sampleRowCount; $i++)
+        @foreach($sampleRows as $i)
             @php
                 $defaultLab = '';
 
@@ -388,7 +398,7 @@
                     {{ hVal($sampleRemarks, $i) }}
                 </td>
             </tr>
-        @endfor
+        @endforeach
     </tbody>
 </table>
 

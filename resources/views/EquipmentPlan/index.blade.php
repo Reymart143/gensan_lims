@@ -27,10 +27,10 @@
                                         <form class="row g-3 needs-validation" action="{{ route('lf_03_05.store')}}" method="POST" novalidate>
                                             @csrf
                                             <div class="col-md-6 position-relative  mb-2">
-                                                <label for="equipment" class="form-label">Equipment</label>
+                                                <label for="equipment" class="form-label">Item</label>
                                                 <input type="text" class="form-control" id="equipment" required name="equipment">
                                                 <div class="invalid-tooltip">
-                                                    Please provide a Equipment.
+                                                    Please provide a Item.
                                                 </div>
                                                 <div class="valid-tooltip">
                                                     Looks good!
@@ -38,16 +38,25 @@
                                             </div>
 
                                             <div class="col-md-6 position-relative mb-2">
-                                                <label for="equipment_no" class="form-label">Equipment No.</label>
+                                                <label for="equipment_no" class="form-label">Item No.</label>
                                                 <input type="text" class="form-control" id="equipment_no" required name="equipment_no">
                                                 <div class="invalid-tooltip">
-                                                    Please provide a Equipment No.
+                                                    Please provide a Item No.
                                                 </div>
                                                 <div class="valid-tooltip">
                                                     Looks good!
                                                 </div>
                                             </div>
-
+                                            {{-- <div class="col-md-6 position-relative mb-2">
+                                                <label for="category" class="form-label">Category</label>
+                                                <input type="text" class="form-control" id="category" required name="category">
+                                                <div class="invalid-tooltip">
+                                                    Please provide a Category.
+                                                </div>
+                                                <div class="valid-tooltip">
+                                                    Looks good!
+                                                </div>
+                                            </div> --}}
                                             <div class="col-md-6 position-relative mt-4 mb-2">
                                                 <label for="model" class="form-label">Brand/Model</label>
                                                 <input type="text" class="form-control" id="model" required name="model">
@@ -124,8 +133,8 @@
                                 <table id="user-list-table" class="table table-striped" role="grid" data-bs-toggle="data-table">
                                     <thead>
                                         <tr class="light">
-                                            <th>Equipment </th>
-                                            <th>Equipment No.</th>
+                                            <th>Item </th>
+                                            <th>Item No.</th>
                                             <th>Brand Model</th>
                                             <th>Location</th>
                                             <th>Month</th>

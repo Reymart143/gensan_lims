@@ -446,9 +446,11 @@ tr {
                 <td>{{ $sampleCode }}</td>
                 <td>{{ $sampleType }}</td>
 
-                @if ($resultColumnCount > 0)
+             @if ($resultColumnCount > 0)
                     @foreach ($analysisRequested as $requested)
-                        <td>{{ $getFishFisheryResult($labCode, $requested) }}</td>
+                        <td class="bold">
+                            {{ $analysisResultsByLabCode[$labCode][$requested] ?? '' }}
+                        </td>
                     @endforeach
                 @else
                     <td></td>

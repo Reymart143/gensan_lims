@@ -258,74 +258,74 @@
 
                                 <script>
 
-                                const ctx = document.getElementById('paymentChart');
+                               const ctx = document.getElementById('paymentChart');
 
-                                new Chart(ctx, {
-                                    type: 'bar',
-                                    data: {
-                                        labels: [
-                                            @foreach($report as $row)
-                                                "{{ $row['month'] }}",
-                                            @endforeach
-                                        ],
-                                        datasets: [{
-                                            data: [
-                                                @foreach($report as $row)
-                                                    {{ $row['payments'] }},
-                                                @endforeach
-                                            ],
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [
+            @foreach($report as $row)
+                "{{ $row['month'] }}",
+            @endforeach
+        ],
+        datasets: [{
+            label: 'Customer Payments',
+            data: [
+                @foreach($report as $row)
+                    {{ $row['payments'] }},
+                @endforeach
+            ],
 
-                                            backgroundColor: '#28a745',
-                                            borderRadius: 8,
+            borderColor: '#3a57e8',
+            backgroundColor: 'rgba(58,87,232,0.12)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
 
-                                            barThickness: 60,
-                                            maxBarThickness: 65
-                                        }]
-                                    },
-                                    options: {
+            pointRadius: 0,
+            pointHoverRadius: 0,
+            pointHitRadius: 10
+        }]
+    },
+    options: {
+        responsive: true,
 
-                                        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
 
-                                        plugins: {
-                                            legend: {
-                                                display: false
-                                            }
-                                        },
+        scales: {
+            x: {
+                grid: {
+                    display: false,
+                    drawBorder: false
+                },
+                ticks: {
+                    color: '#000',
+                    font: {
+                        size: 13,
+                        weight: 'bold'
+                    }
+                }
+            },
 
-                                        scales: {
-
-                                            x: {
-                                                grid: {
-                                                    display: false,
-                                                    drawBorder: false
-                                                },
-                                                ticks: {
-                                                    color: '#000',
-                                                    font: {
-                                                        size: 13,
-                                                        weight: 'bold'
-                                                    }
-                                                }
-                                            },
-
-                                            y: {
-                                                beginAtZero: true,
-
-                                                grid: {
-                                                    display: false
-                                                },
-
-                                                ticks: {
-                                                    display: false
-                                                },
-
-                                                border: {
-                                                    display: false
-                                                }
-                                            }
-                                        }
-                                    }
-                                });
+            y: {
+                beginAtZero: true,
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    display: false
+                },
+                border: {
+                    display: false
+                }
+            }
+        }
+    }
+});
 
                                 </script>
                     </div>

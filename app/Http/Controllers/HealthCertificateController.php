@@ -50,7 +50,7 @@ class HealthCertificateController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-      public function create($id)
+    public function create($id)
     {
         $rla = DB::table('lf_06_02')
             ->join('clients', 'lf_06_02.user_id', '=', 'clients.id')
@@ -69,26 +69,21 @@ class HealthCertificateController extends Controller
         if (!$rla) {
             abort(404);
         }
-
         $certificate = DB::table('health_certificates')
             ->where('rla_no', $rla->RLA_no)
             ->first();
 
         $sampleCodes = json_decode($rla->sample_code ?? '[]', true);
-
         if (!is_array($sampleCodes)) {
             $sampleCodes = [];
         }
-
         $firstSampleCode = $sampleCodes[0] ?? '';
         $allSampleCodes = implode(', ', $sampleCodes);
-
         $sampleDescriptions = json_decode($rla->sample_description ?? '[]', true);
 
         if (!is_array($sampleDescriptions)) {
             $sampleDescriptions = [];
         }
-
         $firstSampleDescription = $sampleDescriptions[0] ?? '';
 
         return view('HealthCertificate.create', compact(
@@ -112,14 +107,12 @@ class HealthCertificateController extends Controller
             'interpretation' => $request->interpretation,
             'user_id' => $request->user_id,
             'rla_no' => $request->rla_no,
-
             'shipper_name' => $request->shipper_name,
             'shipper_address' => $request->shipper_address,
             'company_facility_name' => $request->company_facility_name,
             'company_facility_address' => $request->company_facility_address,
             'shipper_telephone' => $request->shipper_telephone,
             'shipper_registration_no' => $request->shipper_registration_no,
-
             'commodity_description' => $request->commodity_description,
             'scientific_name' => $request->scientific_name,
             'quantity' => $request->quantity,
@@ -127,18 +120,15 @@ class HealthCertificateController extends Controller
             'wild_caught_culture' => $request->wild_caught_culture,
             'tank_number' => $request->tank_number,
             'pond_cage_number' => $request->pond_cage_number,
-
             'consignee_name' => $request->consignee_name,
             'consignee_address' => $request->consignee_address,
             'consignee_registration_no' => $request->consignee_registration_no,
             'consignee_telephone' => $request->consignee_telephone,
-
             'place_of_loading' => $request->place_of_loading,
             'loading_address' => $request->loading_address,
             'date_of_departure' => $request->date_of_departure ?: null,
             'means_of_transport' => $request->means_of_transport,
             'port_of_destination' => $request->port_of_destination,
-
             'sample_code' => $request->sample_code,
             'result' => $request->result,
             'disease_toxin_microbes' => $request->disease_toxin_microbes,
@@ -147,11 +137,9 @@ class HealthCertificateController extends Controller
             'issued_date' => $request->issued_date ?: null,
             'certifying_officer' => $request->certifying_officer,
             'certifying_officer_position' => $request->certifying_officer_position,
-
             'fees_collected' => $request->fees_collected ?: null,
             'or_no' => $request->or_no,
             'or_date' => $request->or_date ?: null,
-
             'updated_at' => now(),
         ];
 

@@ -9,7 +9,7 @@
         }
 
         body {
-           font-family: Cambria, "Times New Roman", serif;
+            font-family: Cambria, "Times New Roman", serif;
             font-size: 12px;
             color: #000;
             margin: 0;
@@ -475,12 +475,20 @@
                     <div class="indent">6.3 RFL12 shall consider request for changes to entry (Address, Consignee, Destination, Product Code) in RLA or Report of Test.</div>
                     <div>7. After the conduct of test, the tested samples shall be retained accordingly. RFL12 shall entertain inquiries/claims regarding this particular testing work only within this period (14 days after submission of samples). After this period had elapsed, RFL12 implements its procedure for retrieval/disposal of tested samples.</div>
                     <div>8. To facilitate the retrieval of tested samples kindly note your intention below:</div>
-                    <div class="indent">_____ The customer will retrieve the retained sample.</div>
-                    <div class="indent">_____ The customer will not retrieve the retained sample.</div>
+                   <div class="indent">
+                            <span style="display:inline-block;width:8px;height:8px;border:1px solid #000;margin-bottom:2px;margin-top:2px;border-radius:30%;background:{{ $rla->retrieve_sample == 'yes' ? '#000' : '#fff' }};"></span>
+                            The customer will retrieve the retained sample.
+                        </div>
+
+                        <div class="indent">
+                            <span style="display:inline-block;width:8px;height:8px;border:1px solid #000;border-radius:30%;background:{{ $rla->retrieve_sample == 'no' ? '#000' : '#fff' }};"></span>
+                            The customer will not retrieve the retained sample.
+                        </div>
                     <div>9. Re-test/Re-sampling shall only be conducted for samples that failed with a (the) requirement(s) of the relevant Test Method. In this connection please be guided that:</div>
                     <div class="indent">9.1 Re-test shall be performed on the retained sample and only for the specific test requirement that the sample failed.</div>
                     <div class="indent">9.2 Re-sampling shall be performed on the new sample drawn and submitted and for all the test requirements. RFL12 shall consider this request as new testing work. Thus, another Request for Laboratory Analyses shall be filed.</div>
-                    <div>10. The Official Test Report for the sample shall be released on ____________________, in accordance with the Work Schedule. For industry samples, official Report of Test shall not be released without the full payment of testing fee. RFL12 shall not send official Report of Test through fax or e-mail unless otherwise authorized by the Laboratory Manager.</div>
+                    <div>10. The Official Test Report for the sample shall be released on  {{ $rla->release_date ? \Carbon\Carbon::parse($rla->release_date)->format('F d, Y') : '____________________' }},
+, in accordance with the Work Schedule. For industry samples, official Report of Test shall not be released without the full payment of testing fee. RFL12 shall not send official Report of Test through fax or e-mail unless otherwise authorized by the Laboratory Manager.</div>
                     <div>11. For samples that don’t meet the requirements, the customer will sign the Sample Waiver Form, LF 06-07.</div>
                 </div>
 

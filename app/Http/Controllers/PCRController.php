@@ -39,43 +39,34 @@ class PCRController extends Controller
         'lf_06_02_id' => $id,
         'user_id' => $request->user_id ?? $rla->user_id,
         'rla_no' => $request->rla_no ?? $rla->RLA_no,
-
         'test_method' => json_encode($request->test_method ?? []),
         'sample_type' => json_encode($request->sample_type ?? []),
-
         'total_no_of_sample' => $request->total_no_of_sample,
         'analysis' => $request->analysis,
         'date_time_started' => $request->date_time_started,
         'date_time_finished' => $request->date_time_finished,
         'kit_lot_no' => $request->kit_lot_no,
-
         'fish_pcr_premix' => $request->fish_pcr_premix,
         'fish_pcr_premix_result' => $request->fish_pcr_premix_result,
         'dnazyme_polymerase' => $request->dnazyme_polymerase,
         'dnazyme_polymerase_result' => $request->dnazyme_polymerase_result,
-
         'nested_pcr_premix' => $request->nested_pcr_premix,
         'nested_pcr_premix_result' => $request->nested_pcr_premix_result,
         'dnazyme_dna_polymerase' => $request->dnazyme_dna_polymerase,
         'dnazyme_dna_polymerase_result' => $request->dnazyme_dna_polymerase_result,
-
         'ems_ahpnd_premix' => $request->ems_ahpnd_premix,
         'ems_ahpnd_premix_result' => $request->ems_ahpnd_premix_result,
         'dnazyme_dna_polymerase_2' => $request->dnazyme_dna_polymerase_2,
         'dnazyme_dna_polymerase_2_result' => $request->dnazyme_dna_polymerase_2_result,
-
         'diagnosis_rla' => json_encode($request->diagnosis_rla ?? []),
         'diagnosis_lane_no' => json_encode($request->diagnosis_lane_no ?? []),
         'diagnosis_laboratory_code' => json_encode($request->diagnosis_laboratory_code ?? []),
         'diagnosis_50nm' => json_encode($request->diagnosis_50nm ?? []),
         'diagnosis_55nm' => json_encode($request->diagnosis_55nm ?? []),
         'diagnosis_result' => json_encode($request->diagnosis_result ?? []),
-
         'picture' => $picturePath,
-
         'analyzed_by' => $request->analyzed_by,
         'checked_by' => $request->checked_by,
-
         'updated_at' => now(),
     ];
 

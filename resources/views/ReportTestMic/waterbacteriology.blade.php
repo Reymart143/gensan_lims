@@ -561,10 +561,10 @@
                 <td class="bold">{{ $sampleCode }}</td>
                 <td class="bold">{!! nl2br(e($sampleType)) !!}</td>
 
-                @if ($resultColumnCount > 0)
+               @if ($resultColumnCount > 0)
                     @foreach ($analysisRequested as $requested)
                         <td class="bold">
-                            {{ $getBacteriologyResult($labCode, $requested) }}
+                            {{ $analysisResultsByLabCode[$labCode][$requested] ?? '' }}
                         </td>
                     @endforeach
                 @else

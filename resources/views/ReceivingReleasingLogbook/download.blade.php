@@ -177,56 +177,100 @@
             <th style="width:7%;">OFFICIAL<br>RECEIPT NO.</th>
             <th style="width:8%;">DATE<br>RELEASED</th>
             <th style="width:8%;">RELEASED TO</th>
+            <th style="width:8%;">SIGNATURE</th>
         </tr>
     </thead>
 
-    <tbody>
-        @foreach ($rla as $index => $r)
-            <tr>
-                <td class="center">{{ $index + 1 }}</td>
+   <tbody>
+    @foreach ($rla as $index => $r)
+        <tr>
 
-                <td class="center">{{ $r->RLA_no ?? '' }}</td>
+            <td class="center">
+                {{ $index + 1 }}
+            </td>
 
-                <td>{{ $r->company_name ?? '' }}</td>
+            <td class="center">
+                {{ $r->RLA_no ?? '' }}
+            </td>
 
-                <td>
-                    {{ $r->sample_description[0] ?? '' }}
-                </td>
+            <td>
+                {{ $r->company_name ?? '' }}
+            </td>
 
-                <td>
-                    @foreach ($r->sample_code as $code)
-                        <div style="white-space: nowrap;">{{ $code }}</div>
-                    @endforeach
-                </td>
+            {{-- SAMPLE DESCRIPTION --}}
+            <td>
+                {{ $r->sample_description[0] ?? '' }}
+            </td>
 
-                <td>
-                    @foreach ($r->laboratory_code as $code)
-                        <div style="white-space: nowrap;">{{ $code }}</div>
-                    @endforeach
-                </td>
+            {{-- SAMPLE CODE --}}
+            <td>
+                @foreach ($r->sample_code as $code)
+                    <div style="white-space: nowrap;">
+                        {{ $code }}
+                    </div>
+                @endforeach
+            </td>
 
-                <td class="center">{{ $r->sample_received_by ?? '' }}</td>
+            {{-- INDIVIDUAL LABORATORY CODE --}}
+            <td>
+                <div style="white-space: nowrap;">
+                    {{ $r->laboratory_code ?? '' }}
+                </div>
+            </td>
 
-                <td class="center">
-                    {{ $r->date_received ? \Carbon\Carbon::parse($r->date_received)->format('m/d/Y') : '' }}
-                </td>
+            <td class="center">
+                {{ $r->sample_received_by ?? '' }}
+            </td>
 
-                <td>
-                    @foreach ($r->report_test_no as $reportNo)
-                        <div style="white-space: nowrap;">{{ $reportNo }}</div>
-                    @endforeach
-                </td>
+            <td class="center">
+                {{
+                    $r->date_received
+                        ? \Carbon\Carbon::parse($r->date_received)->format('m/d/Y')
+                        : ''
+                }}
+            </td>
 
-                <td class="center">{{ $r->or_no ?? '' }}</td>
+            {{-- SAME REPORT TEST NO. FOR SAME RLA --}}
+            <td>
+                @foreach ($r->report_test_no as $reportNo)
+                    <div style="white-space: nowrap;">
+                        {{ $reportNo }}
+                    </div>
+                @endforeach
+            </td>
 
-                <td class="center">
-                    {{ $r->date_approved_release ? \Carbon\Carbon::parse($r->date_approved_release)->format('m/d/Y') : '' }}
-                </td>
+            <td class="center">
+                {{ $r->or_no ?? '' }}
+            </td>
 
-                <td class="center">{{ $r->sample_received_by ?? '' }}</td>
-            </tr>
-        @endforeach
-    </tbody>
+            <td class="center">
+                {{
+                    $r->date_approved_release
+                        ? \Carbon\Carbon::parse($r->date_approved_release)->format('m/d/Y')
+                        : ''
+                }}
+            </td>
+
+            <td class="center">
+                {{ $r->company_name ?? '' }}
+            </td>
+            <td class="center">
+                @if (!empty($r->customer_signature))
+                    <img
+                        src="{{ $r->customer_signature }}"
+                        alt="Customer Signature"
+                        style="
+                            max-width: 90px;
+                            max-height: 45px;
+                            display: block;
+                            margin: 0 auto;
+                        "
+                    >
+                @endif
+            </td>
+        </tr>
+    @endforeach
+</tbody>
 </table>
 <table style="width:100%;margin-top:40px;border:none;">
     <tr>

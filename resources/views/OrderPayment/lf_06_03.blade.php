@@ -204,7 +204,7 @@
                          </a> --}}
                         </div>
                         <div class="card-body ">
-                            <input type="text" id="searchInput" style="width: 50%"  placeholder="Search Document Code or Title" class="form-control mb-3">
+                            <input type="search" id="searchInput" data-table-search="#documentsTable" style="width: 50%" placeholder="Search RLA, laboratory code, or customer" class="form-control mb-3">
                             
 
                             <div class="table-responsive">
@@ -214,22 +214,21 @@
                                         <tr class="light">
                                             <th class="text-wrap">RLA NO.</th>
                                             <th class="text-wrap">Customer Name</th>
-                                            <th class="text-wrap">Address</th>
-                                            <th class="text-wrap">Sample</th>
+                                            {{-- <th class="text-wrap">Address</th> --}}
+                                            <th class="text-wrap">Sample Description</th>
                                             <th class="text-wrap">Date Collected</th>
                                             <th class="text-wrap">Payment</th>
-                                            <th class="text-wrap">Status</th>
+                                            {{-- <th class="text-wrap">Status</th> --}}
                                             <th style="min-width: 100px">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($rla as $r)
-                                             <tr>
-                                            
+                                             <tr data-search="{{ $r->laboratory_code ?? '' }}">
                                                 <td class="text-wrap">{{ $r->RLA_no}}</td>
                                                 <td class="text-wrap">{{ $r->company_name}}</td>
-                                                <td class="text-wrap">{{ $r->address}}</td>
-                                                <td class="text-wrap">{{ $r->source_sample}}</td>
+                                                {{-- <td class="text-wrap">{{ $r->address}}</td> --}}
+                                                <td class="text-wrap">{{ $r->sample_description ?? '' }}</td>
                                                 <td class="text-wrap">{{ $r->date_collected}}</td>
                                                  <td class="text-wrap">{{ $r->payment}}</td>
                                                 <style>
@@ -239,7 +238,6 @@
                                                         margin-bottom: 20px;
                                                     }
 
-                                                    /* 🔥 VERTICAL LINE */
                                                     .timeline-item::before {
                                                         content: "";
                                                         position: absolute;
@@ -250,12 +248,10 @@
                                                         background: #dee2e6;
                                                     }
 
-                                                    /* remove last line */
                                                     .timeline-item:last-child::before {
                                                         height: 14px;
                                                     }
 
-                                                    /* 🔵 CIRCLE */
                                                     .timeline-icon {
                                                         position: absolute;
                                                         left: 0;
@@ -271,118 +267,189 @@
                                                         font-weight: bold;
                                                     }
 
-                                                    /* ✅ COMPLETED */
                                                     .timeline-icon.done {
                                                         background: #198754;
                                                     }
 
-                                                    /* 🔵 CURRENT */
                                                     .timeline-icon.current {
                                                         background: #0d6efd;
                                                     }
 
-                                                    /* TEXT */
                                                     .timeline-content {
                                                         padding-left: 5px;
                                                     }
                                                 </style>
-                                                @php
-                                                    $statuses = [
-                                                        0 => ['label' => 'On Process', 'class' => 'bg-secondary'],
-                                                        1 => ['label' => 'Order of Payment', 'class' => 'bg-primary'],
-                                                        2 => ['label' => 'Job Routing Form', 'class' => 'bg-info'],
-                                                        3 => ['label' => 'Analysis Worksheet', 'class' => 'bg-secondary'],
-                                                        4 => ['label' => 'Equipment Logs', 'class' => 'bg-secondary'],
-                                                        5 => ['label' => 'ENVIRONMENTAL MONITORING LOGBOOK', 'class' => 'bg-secondary'],
-                                                        6 => ['label' => 'Sample Disposal Logs', 'class' => 'bg-info'],
-                                                        7 => ['label' => 'Preparation Report Test', 'class' => 'bg-warning'],
-                                                        8 => ['label' => 'Release', 'class' => 'bg-success'],
-                                                    ];
+                                               @php
+                                                $statuses = [
+                                                    0 => ['label' => 'On Process', 'class' => 'bg-secondary'],
+                                                    1 => ['label' => 'Order of Payment', 'class' => 'bg-primary'],
+                                                    2 => ['label' => 'Job Routing Form', 'class' => 'bg-info'],
+                                                    3 => ['label' => 'Analysis Worksheet', 'class' => 'bg-secondary'],
+                                                    4 => ['label' => 'Equipment Logs', 'class' => 'bg-secondary'],
+                                                    5 => ['label' => 'ENVIRONMENTAL MONITORING LOGBOOK', 'class' => 'bg-secondary'],
+                                                    6 => ['label' => 'Sample Disposal Logs', 'class' => 'bg-info'],
+                                                    7 => ['label' => 'Preparation Report Test', 'class' => 'bg-warning'],
+                                                    8 => ['label' => 'Release', 'class' => 'bg-success'],
+                                                ];
 
-                                                    $currentStatus = $statuses[$r->status] ?? ['label' => 'Hold', 'class' => 'bg-danger'];
-                                                @endphp
 
-                                                <td>
-                                                    <!-- CLICKABLE BADGE -->
-                                                    <button type="button"
-                                                        class="badge {{ $currentStatus['class'] }} p-2 border-0"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#statusModal{{ $r->id }}">
-                                                        {{ $currentStatus['label'] }}
-                                                    </button>
+                                                $rlaLaboratoryStatuses = $laboratoryStatuses[$r->RLA_no] ?? collect();
 
-                                                    <!-- MODAL -->
-                                                    <div class="modal fade" id="statusModal{{ $r->id }}" tabindex="-1">
-                                                        <div class="modal-dialog modal-dialog-centered">
-                                                            <div class="modal-content">
+                            
 
-                                                                <!-- HEADER -->
-                                                                <div class="modal-header bg-success text-white">
-                                                                    <h5 class="modal-title">Status Progress</h5>
-                                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                                </div>
+                                                $currentStatusNumber = $rlaLaboratoryStatuses->isNotEmpty()
+                                                    ? $rlaLaboratoryStatuses->max('status')
+                                                    : 0;
 
-                                                                <!-- BODY -->
-                                                                <div class="modal-body">
+                                                $currentStatus = $statuses[$currentStatusNumber]
+                                                    ?? ['label' => 'Hold', 'class' => 'bg-danger'];
+                                            @endphp
 
-                                                                    <h6 class="mb-3">
-                                                                        Current Status:
-                                                                        <span class="badge {{ $currentStatus['class'] }}">
-                                                                            {{ $currentStatus['label'] }}
-                                                                        </span>
-                                                                    </h6>
+                                            {{-- <td>
 
-                                                                    <!-- TIMELINE -->
-                                                                    @foreach($statuses as $key => $status)
-                                                                        <div class="timeline-item">
+                                                <!-- CLICKABLE BADGE -->
+                                                <button type="button"
+                                                    class="badge {{ $currentStatus['class'] }} p-2 border-0"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#statusModal{{ $r->id }}">
 
-                                                                            <!-- CIRCLE -->
-                                                                            <div class="timeline-icon
-                                                                                {{ $r->status > $key ? 'done' : '' }}
-                                                                                {{ $r->status == $key ? 'current' : '' }}">
-                                                                                {{ $key + 1 }}
-                                                                            </div>
+                                                    {{ $currentStatus['label'] }}
 
-                                                                            <!-- CONTENT -->
-                                                                            <div class="timeline-content">
-                                                                                <strong>{{ $status['label'] }}</strong><br>
+                                                </button>
 
-                                                                                @if($r->status > $key)
-                                                                                    <small class="text-success">Completed</small>
-                                                                                @elseif($r->status == $key)
-                                                                                    <small class="text-primary">Current step</small>
-                                                                                @else
-                                                                                    <small class="text-muted">Pending</small>
-                                                                                @endif
-                                                                            </div>
 
-                                                                        </div>
-                                                                    @endforeach
+                                                <!-- MODAL -->
+                                                <div class="modal fade"
+                                                    id="statusModal{{ $r->id }}"
+                                                    tabindex="-1">
 
-                                                                    @if(!array_key_exists($r->status, $statuses))
-                                                                        <div class="alert alert-danger mt-3">
-                                                                            This request is currently on hold.
-                                                                        </div>
-                                                                    @endif
+                                                    <div class="modal-dialog modal-dialog-centered">
 
-                                                                </div>
+                                                        <div class="modal-content">
+
+                                                            <!-- HEADER -->
+                                                            <div class="modal-header bg-success text-white">
+
+                                                                <h5 class="modal-title">
+                                                                    Status Progress
+                                                                </h5>
+
+                                                                <button type="button"
+                                                                    class="btn-close btn-close-white"
+                                                                    data-bs-dismiss="modal">
+                                                                </button>
 
                                                             </div>
+
+
+                                                            <!-- BODY -->
+                                                            <div class="modal-body">
+
+                                                                <h6 class="mb-3">
+
+                                                                    Current Status:
+
+                                                                    <span class="badge {{ $currentStatus['class'] }}">
+
+                                                                        {{ $currentStatus['label'] }}
+
+                                                                    </span>
+
+                                                                </h6>
+
+
+                                                                <!-- TIMELINE -->
+                                                                @foreach($statuses as $key => $status)
+
+                                                                    <div class="timeline-item">
+
+                                                                        <!-- CIRCLE -->
+                                                                        <div class="timeline-icon
+                                                                            {{ $currentStatusNumber > $key ? 'done' : '' }}
+                                                                            {{ $currentStatusNumber == $key ? 'current' : '' }}">
+
+                                                                            {{ $key + 1 }}
+
+                                                                        </div>
+
+
+                                                                        <!-- CONTENT -->
+                                                                        <div class="timeline-content">
+
+                                                                            <strong>
+                                                                                {{ $status['label'] }}
+                                                                            </strong>
+
+                                                                            <br>
+
+
+                                                                            @if($currentStatusNumber > $key)
+
+                                                                                <small class="text-success">
+                                                                                    Completed
+                                                                                </small>
+
+                                                                            @elseif($currentStatusNumber == $key)
+
+                                                                                <small class="text-primary">
+                                                                                    Current step
+                                                                                </small>
+
+                                                                            @else
+
+                                                                                <small class="text-muted">
+                                                                                    Pending
+                                                                                </small>
+
+                                                                            @endif
+
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                @endforeach
+
+
+                                                                @if(!array_key_exists($currentStatusNumber, $statuses))
+
+                                                                    <div class="alert alert-danger mt-3">
+                                                                        This request is currently on hold.
+                                                                    </div>
+
+                                                                @endif
+
+                                                            </div>
+
                                                         </div>
+
                                                     </div>
-                                                </td>
+
+                                                </div>
+
+                                                </td> --}}
                                                 {{-- <td>Page 1</td> --}}
-                                                <td>
-                                                     @php
-                                                        $isDisabled = $r->status != 1;
+                                                <td class="text-wrap">
+                                                   @php
+                                                  
+                                                        $rlaLaboratoryStatuses = $laboratoryStatuses[$r->RLA_no] ?? collect();
+
+                                                        $currentStatusNumber = $rlaLaboratoryStatuses->isNotEmpty()
+                                                            ? $rlaLaboratoryStatuses->max('status')
+                                                            : 0;
+                                                        $isDisabled = $currentStatusNumber != 0 && $currentStatusNumber != 1;
+
+                                                        $isDisableds = $currentStatusNumber != 0;
                                                     @endphp
                                                     <div class="flex align-items-center list-user-action">
-                                                            <a class="btn btn-sm btn-icon btn-warning paymentRlaBtn {{ $isDisabled ? 'disabled' : '' }}"
+                                                            <a class="btn btn-sm btn-icon btn-warning paymentRlaBtn "
                                                             href="javascript:void(0);"
-                                                            data-bs-toggle="{{ $isDisabled ? '' : 'modal' }}"
-                                                            data-bs-target="{{ $isDisabled ? '' : '#paymentRLAModal' }}"
+                                                          
                                                             data-id="{{ $r->id }}"
-                                                            style="{{ $isDisabled ? 'pointer-events:none; opacity:0.6;' : '' }}"
+                                                     
+                                                              data-bs-toggle="modal"
+                                                                data-bs-target="#paymentRLAModal"
+                                                                data-id="{{ $r->id }}"
+                                                              
                                                             title="Payment"
                                                             aria-label="Payment">
                                                                 <span class="btn-inner">
@@ -912,7 +979,11 @@ $(document).ready(function () {
                 $('#signature').val(response.signature ?? '');
 
                 if (Array.isArray(response.items)) {
-                    loadSavedPaymentItems(response.items);
+                    if (response.has_existing_payment && response.items.length) {
+                        loadSavedPaymentItems(response.items);
+                    } else {
+                        selectRequestedAnalyses(response.analysis_requested ?? []);
+                    }
                 }
             },
             error: function (xhr) {
@@ -1061,6 +1132,51 @@ $(document).ready(function () {
                     }
                 }
             });
+        });
+
+        computeGrandTotal();
+    }
+
+    function selectRequestedAnalyses(requested) {
+        const names = [];
+        const flatten = (value) => {
+            if (Array.isArray(value)) {
+                value.forEach(flatten);
+            } else if (value !== null && value !== undefined && String(value).trim() !== '') {
+                names.push(String(value).trim());
+            }
+        };
+        flatten(requested);
+
+        const normalize = (value) => String(value).toLowerCase().replace(/[^a-z0-9]/g, '');
+        const aliases = {
+            apc: 'aerobicplatecountapc',
+            hpc: 'heterotrophicplatecounthpc',
+            ecoli: 'ecoli',
+            ecoliform: 'fecalcoliform',
+            totalcoliform: 'coliform',
+            saureus: 'staphaureus',
+            histamine: 'histamine',
+            moisturecontent: 'moisture',
+            parasitologicalexamination: 'parasiteexamination',
+            grossexamination: 'grossmicroscopicexamination'
+        };
+        const requestedNames = new Set(names.map((name) => aliases[normalize(name)] || normalize(name)));
+
+        document.querySelectorAll('#paymentRLAForm input[type="hidden"][name$="[name]"]').forEach((hiddenInput) => {
+            const itemName = normalize(hiddenInput.value);
+            const matches = requestedNames.has(itemName) ||
+                (itemName === 'ecoli' && requestedNames.has('ecoli')) ||
+                (itemName === 'coliform' && requestedNames.has('totalcoliform'));
+            if (!matches) return;
+
+            const row = hiddenInput.closest('tr');
+            const checkbox = row.querySelector('.chk');
+            const quantity = row.querySelector('.qty');
+            checkbox.checked = true;
+            quantity.disabled = false;
+            quantity.value = 1;
+            recalcRow(row);
         });
 
         computeGrandTotal();

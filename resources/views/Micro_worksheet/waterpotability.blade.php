@@ -32,7 +32,7 @@
 
     $labCodes = wpJson($rla->laboratory_code ?? null);
     $firstLabCode = $labCodes[0] ?? '';
-
+    
     $hpcDilution = $worksheet ? wpJson($worksheet->hpc_dilution ?? null) : [];
     $hpcR1 = $worksheet ? wpJson($worksheet->hpc_r1 ?? null) : [];
     $hpcR2 = $worksheet ? wpJson($worksheet->hpc_r2 ?? null) : [];
@@ -459,7 +459,7 @@
                         <td style="width:25%;">
                             <span class="info-label">Lab Code:</span>
                             <input type="text" name="lab_code" class="input-cell"
-                                   value="{{ old('lab_code', $worksheet->lab_code ?? $firstLabCode) }}">
+                                   value="{{ old('lab_code', $worksheet->lab_code ?? $selectedLabCode ) }}">
                         </td>
 
                         <td style="width:25%;">
@@ -785,7 +785,9 @@
                         <td>
                             <select name="analyzed_by" class="signature-select">
                                 <option value="">Select Analyst</option>
-                                @foreach($users as $user)
+                                 <option value="C2LS">C2LS</option>
+                                <option value="EGBJ">EGBJ</option>
+                                {{-- @foreach($users as $user)
                                     @php
                                         $fullName = trim(($user->f_name ?? '') . ' ' . ($user->m_name ?? '') . ' ' . ($user->l_name ?? ''));
                                     @endphp
@@ -793,13 +795,15 @@
                                         {{ old('analyzed_by', $worksheet->analyzed_by ?? '') == $fullName ? 'selected' : '' }}>
                                         {{ $fullName }}
                                     </option>
-                                @endforeach
+                                @endforeach --}}
                             </select>
                         </td>
                         <td>
                             <select name="checked_by" class="signature-select">
                                 <option value="">Select Checker</option>
-                                @foreach($users as $user)
+                                 <option value="C2LS">C2LS</option>
+                                <option value="EGBJ">EGBJ</option>
+                                {{-- @foreach($users as $user)
                                     @php
                                         $fullName = trim(($user->f_name ?? '') . ' ' . ($user->m_name ?? '') . ' ' . ($user->l_name ?? ''));
                                     @endphp
@@ -807,7 +811,7 @@
                                         {{ old('checked_by', $worksheet->checked_by ?? '') == $fullName ? 'selected' : '' }}>
                                         {{ $fullName }}
                                     </option>
-                                @endforeach
+                                @endforeach --}}
                             </select>
                         </td>
                     </tr>

@@ -17,7 +17,7 @@
                         <div class="card-body ">
                             <input type="text" id="searchInput" style="width: 50%"  placeholder="Search Document Code or Title" class="form-control mb-3">
                             
-
+                            
                             <div class="table-responsive">
                                 
                                 <table id="documentsTable" class="table table-striped" role="grid" data-bs-toggle="data-table">

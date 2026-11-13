@@ -45,8 +45,10 @@
     }
 
     $labCodes = ffJson($rla->laboratory_code ?? null);
-    $firstLabCode = $labCodes[0] ?? '';
 
+    $firstLabCode = $labCodes[0] ?? '';
+    $selectedLabCode = $selectedLabCode ?? request('laboratory_code');
+        //   dd($selectedLabCode);
     $sampleDescriptions = ffJson($rla->sample_description ?? null);
     $firstSampleDescription = $sampleDescriptions[0] ?? '';
 
@@ -69,11 +71,38 @@
         return false;
     };
 
-    $showApc = $selected(['APC', 'AEROBIC PLATE COUNT']);
-    $showEcoli = $selected(['E COLI', 'E. COLI', 'TOTAL COLIFORM', 'FECAL COLIFORM']);
-    $showStaph = $selected(['S. AUREUS', 'STAPHYLOCOCCUS AUREUS']);
-    $showSalmonella = $selected(['SALMONELLA']);
-    $showShigella = $selected(['SHIGELLA']);
+   
+    $showApc = true;
+    $showEcoli = true;
+    $showStaph = true;
+    $showSalmonella = true;
+    $showShigella = true;
+
+
+/*
+    Check if selected/requested
+*/
+$isRequested = function ($needles) use ($analysisUpper) {
+
+    foreach ($needles as $needle) {
+
+        $needle = strtoupper($needle);
+
+        foreach ($analysisUpper as $item) {
+
+            if (
+                $item === $needle ||
+                str_contains($item, $needle) ||
+                str_contains($needle, $item)
+            ) {
+                return true;
+            }
+
+        }
+    }
+
+    return false;
+};
 
     $dateTimeStarted = old('date_time_started', ffDateTimeValue($worksheet->date_time_started ?? ''));
     $dateTimeFinished = old('date_time_finished', ffDateTimeValue($worksheet->date_time_finished ?? ''));
@@ -743,7 +772,7 @@
                         <td style="width:23%;">
                             <b>Lab Code:</b>
                             <input type="text" name="lab_code" class="input-cell"
-                                value="{{ old('lab_code', $worksheet->lab_code ?? $firstLabCode) }}">
+                                 value="{{ old('lab_code', $worksheet->lab_code ?? $selectedLabCode ) }}">
                         </td>
                         <td style="width:27%;">
                             <b>Date/Time Started:</b>
@@ -766,55 +795,107 @@
 
                 {{-- APC --}}
                 @if($showApc)
-                    <table class="ff-table micro-table">
-                        <colgroup>
-                            <col style="width:16%;">
-                            @for($i = 0; $i < 12; $i++)
-                                <col style="width:6.2%;">
-                            @endfor
-                            <col style="width:9.6%;">
-                        </colgroup>
+                 <table class="ff-table micro-table">
+                    <colgroup>
+                        <col style="width:16%;">
 
-                        <tr>
-                            <th rowspan="3">TESTS</th>
-                            <th colspan="12">Dilutions</th>
-                            <th rowspan="3">RESULTS</th>
-                        </tr>
-                        <tr>
-                            @foreach($apcDilutions as $label)
-                                <th colspan="2">{{ $label }}</th>
-                            @endforeach
-                        </tr>
-                        <tr>
-                            @foreach($apcDilutions as $label)
-                                <th>R1</th>
-                                <th>R2</th>
-                            @endforeach
-                        </tr>
-                        <tr>
-                            <td class="test-name">Aerobic Plate Count</td>
+                        @for($i = 0; $i < 12; $i++)
+                            <col style="width:6.2%;">
+                        @endfor
 
-                            @foreach(array_keys($apcDilutions) as $code)
-                                <td>
-                                    <input type="text" name="apc_{{ $code }}_r1" class="input-cell" value="{{ $val('apc_' . $code . '_r1') }}">
-                                </td>
-                                <td>
-                                    <input type="text" name="apc_{{ $code }}_r2" class="input-cell" value="{{ $val('apc_' . $code . '_r2') }}">
-                                </td>
-                            @endforeach
+                        <col style="width:9.6%;">
+                    </colgroup>
 
-                            <td class="unit-cell">
-                                <input type="text" name="apc_result" class="unit-input" value="{{ $val('apc_result') }}">
-                                cfu / g
+                    <tr>
+                        <th rowspan="3">TESTS</th>
+                        <th colspan="12">Dilutions</th>
+                        <th rowspan="3">RESULTS</th>
+                    </tr>
+
+                    <tr>
+                        @foreach($apcDilutions as $label)
+                            <th colspan="2">{{ $label }}</th>
+                        @endforeach
+                    </tr>
+
+                    <tr>
+                        @foreach($apcDilutions as $label)
+                            <th>R1</th>
+                            <th>R2</th>
+                        @endforeach
+                    </tr>
+
+                    <tr>
+                        <td class="test-name">Aerobic Plate Count</td>
+
+                        @foreach(array_keys($apcDilutions) as $code)
+                            @php
+                                /*
+                                * User can enter values only from:
+                                * 10^-2, 10^-3 and 10^-4
+                                */
+                                $isEditable = in_array($code, ['10_2', '10_3', '10_4']);
+
+                                $r1Value = $isEditable
+                                    ? $val('apc_' . $code . '_r1')
+                                    : 0;
+
+                                $r2Value = $isEditable
+                                    ? $val('apc_' . $code . '_r2')
+                                    : 0;
+                            @endphp
+
+                            <td>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    name="apc_{{ $code }}_r1"
+                                    id="apc_{{ $code }}_r1"
+                                    class="input-cell apc-count"
+                                    value="{{ $r1Value }}"
+                                    data-dilution="{{ $code }}"
+                                    data-replicate="r1"
+                                    {{ !$isEditable ? 'readonly' : '' }}
+                                >
                             </td>
-                        </tr>
-                    </table>
 
-                    <table class="ff-table">
-                        <tr class="section-gap">
-                            <td></td>
-                        </tr>
-                    </table>
+                            <td>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    name="apc_{{ $code }}_r2"
+                                    id="apc_{{ $code }}_r2"
+                                    class="input-cell apc-count"
+                                    value="{{ $r2Value }}"
+                                    data-dilution="{{ $code }}"
+                                    data-replicate="r2"
+                                    {{ !$isEditable ? 'readonly' : '' }}
+                                >
+                            </td>
+                        @endforeach
+
+                        <td class="unit-cell">
+                            <input
+                                type="text"
+                                name="apc_result"
+                                id="apc_result"
+                                class="unit-input"
+                                value="{{ $val('apc_result') }}"
+                                readonly
+                            >
+
+                            cfu / g
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="ff-table">
+                    <tr class="section-gap">
+                        <td></td>
+                    </tr>
+                </table>
                 @endif
 
                 {{-- TOTAL / FECAL / E. COLI - SAME SA PIC --}}
@@ -1229,11 +1310,164 @@
                 </div>
 
                 {{-- CALCULATIONS --}}
-                <div class="calculations-box">
+               <div class="calculations-box">
                     <div class="calculations-title">CALCULATIONS</div>
-                    <textarea name="calculations" class="calculations-textarea">{{ old('calculations', $worksheet->calculations ?? '') }}</textarea>
-                </div>
 
+                    <textarea
+                        name="calculations"
+                        id="calculations"
+                        class="calculations-textarea"
+                    >{{ old('calculations', $worksheet->calculations ?? '') }}</textarea>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const apcResult = document.getElementById('apc_result');
+                        const calculationsTextarea = document.getElementById('calculations');
+
+                        const getValue = function (id) {
+                            const input = document.getElementById(id);
+
+                            if (!input) {
+                                return 0;
+                            }
+
+                            const value = parseFloat(input.value);
+
+                            return Number.isFinite(value) ? value : 0;
+                        };
+
+                        const formatNumber = function (value) {
+                            return new Intl.NumberFormat('en-US', {
+                                maximumFractionDigits: 2
+                            }).format(value);
+                        };
+
+                        /*
+                        * Round to two significant figures.
+                        *
+                        * Example:
+                        * 24,454.55 becomes 24,000
+                        */
+                        const roundToTwoSignificantFigures = function (value) {
+                            if (!Number.isFinite(value) || value === 0) {
+                                return 0;
+                            }
+
+                            const magnitude = Math.floor(Math.log10(Math.abs(value)));
+                            const factor = Math.pow(10, magnitude - 1);
+
+                            return Math.round(value / factor) * factor;
+                        };
+
+                        const calculateApc = function () {
+                            /*
+                            * First selected dilution: 10^-2
+                            */
+                            const dilution1R1 = getValue('apc_10_2_r1');
+                            const dilution1R2 = getValue('apc_10_2_r2');
+
+                            /*
+                            * Second consecutive dilution: 10^-3
+                            */
+                            const dilution2R1 = getValue('apc_10_3_r1');
+                            const dilution2R2 = getValue('apc_10_3_r2');
+
+                            const allValues = [
+                                dilution1R1,
+                                dilution1R2,
+                                dilution2R1,
+                                dilution2R2
+                            ];
+
+                            /*
+                            * Do not compute if no value has been entered.
+                            */
+                            const hasInput = allValues.some(function (value) {
+                                return value > 0;
+                            });
+
+                            if (!hasInput) {
+                                apcResult.value = '';
+                                return;
+                            }
+
+                            /*
+                            * ΣC
+                            */
+                            const sumColonies =
+                                dilution1R1 +
+                                dilution1R2 +
+                                dilution2R1 +
+                                dilution2R2;
+
+                            /*
+                            * n1 = number of valid plates in the first dilution
+                            * n2 = number of valid plates in the second dilution
+                            *
+                            * Zero values are not counted as valid plates.
+                            */
+                            const n1 = [dilution1R1, dilution1R2].filter(function (value) {
+                                return value > 0;
+                            }).length;
+
+                            const n2 = [dilution2R1, dilution2R2].filter(function (value) {
+                                return value > 0;
+                            }).length;
+
+                            /*
+                            * d = 10^-2 = 0.01
+                            */
+                            const dilutionFactor = 0.01;
+
+                            const denominator =
+                                (n1 + (0.1 * n2)) *
+                                dilutionFactor;
+
+                            if (denominator <= 0) {
+                                apcResult.value = '';
+                                return;
+                            }
+                            const exactResult = sumColonies / denominator;
+
+                            const reportedResult = Math.trunc(exactResult / 1000) * 1000;
+
+                            apcResult.value = reportedResult.toLocaleString('en-US');
+
+                            if (calculationsTextarea) {
+                                const calculationText =
+                                    'APC = ΣC / [((n₁ × 1) + (n₂ × 0.1)) × df]\n' +
+                                    'APC = (' +
+                                    dilution1R1 + ' + ' +
+                                    dilution1R2 + ' + ' +
+                                    dilution2R1 + ' + ' +
+                                    dilution2R2 +
+                                    ') / [((' +
+                                    n1 + ' × 1) + (' +
+                                    n2 + ' × 0.1)) × 10⁻²]\n' +
+                                    'APC = ' +
+                                    formatNumber(sumColonies) +
+                                    ' / ' +
+                                    denominator.toFixed(4) +
+                                    '\n' +
+                                    'APC = ' +
+                                    formatNumber(exactResult) +
+                                    ' CFU/g\n' +
+                                    'Reported Result = ' +
+                                    reportedResult.toLocaleString('en-US') +
+                                    ' CFU/g';
+
+                                calculationsTextarea.value = calculationText;
+                            }
+                        };
+
+                        document.querySelectorAll('.apc-count').forEach(function (input) {
+                            input.addEventListener('input', calculateApc);
+                            input.addEventListener('change', calculateApc);
+                        });
+
+                        calculateApc();
+                    });
+                    </script>
                 {{-- SIGNATURE --}}
                 <table class="ff-table signature-table">
                     <tr>
@@ -1245,14 +1479,17 @@
                         <td>
                             <select name="analyzed_by" class="signature-select">
                                 <option value="">Select Analyst</option>
-                                @foreach($users as $user)
+                                <option value="C2LS">C2LS</option>
+                                <option value="EGBJ">EGBJ</option>
+                                {{-- @foreach($users as $user)
                                     @php
                                         $fullName = trim(($user->f_name ?? '') . ' ' . ($user->m_name ?? '') . ' ' . ($user->l_name ?? ''));
                                     @endphp
                                     <option value="{{ $fullName }}" {{ old('analyzed_by', $worksheet->analyzed_by ?? '') == $fullName ? 'selected' : '' }}>
                                         {{ $fullName }}
                                     </option>
-                                @endforeach
+                                @endforeach --}}
+                                
                             </select>
                             <div class="signature-label">Name of Analyst and Signature</div>
                         </td>
@@ -1260,14 +1497,16 @@
                         <td>
                             <select name="checked_by" class="signature-select">
                                 <option value="">Select Checker</option>
-                                @foreach($users as $user)
+                                <option value="C2LS">C2LS</option>
+                                <option value="EGBJ">EGBJ</option>
+                                {{-- @foreach($users as $user)
                                     @php
                                         $fullName = trim(($user->f_name ?? '') . ' ' . ($user->m_name ?? '') . ' ' . ($user->l_name ?? ''));
                                     @endphp
                                     <option value="{{ $fullName }}" {{ old('checked_by', $worksheet->checked_by ?? '') == $fullName ? 'selected' : '' }}>
                                         {{ $fullName }}
                                     </option>
-                                @endforeach
+                                @endforeach --}}
                             </select>
                             <div class="signature-label">Name of Analyst and Signature</div>
                         </td>

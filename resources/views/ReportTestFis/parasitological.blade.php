@@ -461,7 +461,26 @@
                 $sampleType = $displayValue($sample['sample_type'] ?? '');
             @endphp
 
-            @if ($isParasitological)
+          @if ($isParasitological)
+                @php
+                    $labResults = $analysisResultsByLabCode[$labCode] ?? [];
+
+                    $endoResult = '';
+                    $ectoResult = '';
+
+                    foreach ($labResults as $analysisName => $result) {
+                        $normalized = strtoupper(trim($analysisName));
+
+                        if ($normalized === 'ENDOPARASITE') {
+                            $endoResult = $result;
+                        }
+
+                        if ($normalized === 'ECTOPARASITE') {
+                            $ectoResult = $result;
+                        }
+                    }
+                @endphp
+
                 <tr>
                     <td style="width:35px;" class="bold">
                         {{ $index + 1 }}
@@ -480,33 +499,11 @@
                     </td>
 
                     <td class="bold">
-                        {{ $getParasiteResult($labCode, 'endoparasite') }}
+                        {{ $endoResult }}
                     </td>
 
                     <td class="bold">
-                        {{ $getParasiteResult($labCode, 'ectoparasite') }}
-                    </td>
-                </tr>
-            @else
-                <tr>
-                    <td style="width:35px;" class="bold">
-                        {{ $index + 1 }}
-                    </td>
-
-                    <td style="width:130px;" class="bold">
-                        {{ $labCode }}
-                    </td>
-
-                    <td>
-                        {{ $sampleCode }}
-                    </td>
-
-                    <td>
-                        {!! nl2br(e($sampleType)) !!}
-                    </td>
-
-                    <td class="bold">
-                        {{ $getGrossResult($labCode) }}
+                        {{ $ectoResult }}
                     </td>
                 </tr>
             @endif

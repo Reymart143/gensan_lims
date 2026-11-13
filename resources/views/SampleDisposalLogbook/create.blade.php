@@ -38,13 +38,15 @@
                             <select name="lab_code" id="lab_code" class="form-control">
                                 <option value="">-- Select Laboratory Code --</option>
 
-                             @foreach ($RLA as $s)
-                                    <option 
-                                        value="{{ $s->laboratory_code[0] ?? '' }}" 
-                                        data-id="{{ $s->id }}">
-                                        {{ $s->laboratory_code[0] ?? '' }}
-                                    </option>
-                                @endforeach
+                               @foreach ($RLA as $s)
+
+                                <option 
+                                    value="{{ $s->laboratory_code }}" 
+                                    data-id="{{ $s->id }}">
+                                    {{ $s->laboratory_code }}
+                                </option>
+
+                            @endforeach
 
                             </select>
                             <script>

@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $selectedMonth = $selectedMonth ?? 0;
+    $selectedYear = $selectedYear ?? 0;
+    $hasSelectedPeriod = $hasSelectedPeriod ?? false;
+    $years = $years ?? collect();
+    $laboratoryCodeOptions = $laboratoryCodeOptions ?? collect();
+@endphp
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
@@ -116,8 +123,42 @@
         overflow: hidden;
     }
 
-    .table-main input[type="date"]{
+    .table-main input[type="number"]{
         font-size: 11px;
+    }
+
+    .equipment-toggle{
+        appearance: none;
+        width: 42px;
+        height: 22px;
+        margin: 0;
+        border: 0;
+        border-radius: 999px;
+        background: #dc3545;
+        cursor: pointer;
+        position: relative;
+        vertical-align: middle;
+        transition: background-color .2s ease;
+    }
+
+    .equipment-toggle::after{
+        content: '';
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        top: 3px;
+        left: 3px;
+        border-radius: 50%;
+        background: #fff;
+        transition: transform .2s ease;
+    }
+
+    .equipment-toggle:checked{
+        background: #198754;
+    }
+
+    .equipment-toggle:checked::after{
+        transform: translateX(20px);
     }
 
     .action-col{
@@ -168,12 +209,53 @@
 </style>
  <a class="btn btn-sm btn-icon btn-secondary" style="margin-left:8mm" data-bs-toggle="tooltip" data-bs-placement="top" href="/equipments_usage" aria-label="return" title="return">
     <svg class="icon-32" width="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">                            <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 6.48 6.49 2 12 2L12.2798 2.00384C17.6706 2.15216 22 6.57356 22 12C22 17.51 17.52 22 12 22C6.49 22 2 17.51 2 12ZM13.98 16C14.27 15.7 14.27 15.23 13.97 14.94L11.02 12L13.97 9.06C14.27 8.77 14.27 8.29 13.98 8C13.68 7.7 13.21 7.7 12.92 8L9.43 11.47C9.29 11.61 9.21 11.8 9.21 12C9.21 12.2 9.29 12.39 9.43 12.53L12.92 16C13.06 16.15 13.25 16.22 13.44 16.22C13.64 16.22 13.83 16.15 13.98 16Z" fill="currentColor"></path>                            </svg>                        
-</a>    
+</a>
 <div class="container-fluid">
     <div class="page-wrap">
+        <div class="mb-3 screen-only">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#periodModal">
+                Select Period
+            </button>
+        </div>
+
+        <div class="modal fade" id="periodModal" tabindex="-1" aria-labelledby="periodModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <form method="GET" action="{{ route('equipments_book.index', $id) }}" class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="periodModalLabel">Select Logbook Period</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="log_month" class="form-label">Month</label>
+                            <select id="log_month" name="month" class="form-select" required>
+                                <option value="">Select month</option>
+                                @foreach(['01' => 'January', '02' => 'February', '03' => 'March', '04' => 'April', '05' => 'May', '06' => 'June', '07' => 'July', '08' => 'August', '09' => 'September', '10' => 'October', '11' => 'November', '12' => 'December'] as $value => $label)
+                                    <option value="{{ $value }}" {{ (int) $value === $selectedMonth ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label for="log_year" class="form-label">Year</label>
+                            <select id="log_year" name="year" class="form-select" required>
+                                <option value="">Select year</option>
+                                @foreach($years as $year)
+                                    <option value="{{ $year }}" {{ (int) $year === $selectedYear ? 'selected' : '' }}>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Retrieve Logbook</button>
+                    </div>
+                </form>
+            </div>
+        </div>
         <form method="POST" action="{{ route('equipments_lf_03_05.store')}}">
             @csrf
             <input type="hidden" name="equipment_id" value="{{ $id }}">
+            <input type="hidden" name="filter_month" value="{{ $selectedMonth }}">
+            <input type="hidden" name="filter_year" value="{{ $selectedYear }}">
 
             <div class="form-sheet">
 
@@ -274,15 +356,15 @@
                         <td>
                             <div class="meta-row">
                                 <span class="meta-label">Month:</span>
-                                <input type="text" name="month" class="meta-input" 
-                                    value="{{ $equipment->month ? $months[$equipment->month] : '' }}">
+                                <input type="text" class="meta-input" readonly
+                                    value="{{ $hasSelectedPeriod ? $months[str_pad((string) $selectedMonth, 2, '0', STR_PAD_LEFT)] : '' }}">
                             </div>
                         </td>
 
                         <td>
                             <div class="meta-row">
                                 <span class="meta-label">Year:</span>
-                                <input type="text" name="year" class="meta-input" value="{{ $equipment->year ?? '' }}">
+                                <input type="text" class="meta-input" readonly value="{{ $hasSelectedPeriod ? $selectedYear : '' }}">
                             </div>
                         </td>
                     </tr>
@@ -328,19 +410,25 @@
                         </thead>
 
                         <tbody>
-                           @php $rowCount = max($logs->count(), 15); @endphp
-
-                            @for($i = 0; $i < $rowCount; $i++)
-                                @php $log = $logs->get($i); @endphp
+                            @if(!$hasSelectedPeriod)
+                                <tr id="noDataMessage">
+                                    <td colspan="12" class="text-center py-4">Select a month and year to view this equipment logbook.</td>
+                                </tr>
+                            @elseif($logs->isEmpty())
+                                <tr id="noDataMessage">
+                                    <td colspan="12" class="text-center py-4">No log data found for the selected month and year.</td>
+                                </tr>
+                            @else
+                                @foreach($logs as $log)
                                 <tr>
                                     <td>
                                         <input type="hidden" name="log_id[]" value="{{ $log->id ?? '' }}" class="no-print-export">
-                                        <input type="date" name="date[]" value="{{ $log->date ?? '' }}" class="form-control-plain">
+                                        <input type="number" name="date[]" value="{{ $log->date ? (int) substr($log->date, -2) : '' }}" class="form-control-plain" min="1" max="31" step="1" placeholder="Day">
                                     </td>
-                                    <td><input type="text" name="clean_equipment[]" value="{{ $log->clean_equipment ?? '' }}" class="form-control-plain"></td>
-                                    <td><input type="text" name="check_powersupply[]" value="{{ $log->check_powersupply ?? '' }}" class="form-control-plain"></td>
-                                    <td><input type="text" name="switchon_equipment[]" value="{{ $log->switchon_equipment ?? '' }}" class="form-control-plain"></td>
-                                    <td><input type="text" name="shutdown_equipment[]" value="{{ $log->shutdown_equipment ?? '' }}" class="form-control-plain"></td>
+                                    <td><input type="hidden" name="clean_equipment[]" class="toggle-value" value="{{ strtoupper($log->clean_equipment ?? '') === 'ON' ? 'ON' : 'OFF' }}"><input type="checkbox" class="equipment-toggle" {{ strtoupper($log->clean_equipment ?? '') === 'ON' ? 'checked' : '' }} aria-label="Clean the equipment"></td>
+                                    <td><input type="hidden" name="check_powersupply[]" class="toggle-value" value="{{ strtoupper($log->check_powersupply ?? '') === 'ON' ? 'ON' : 'OFF' }}"><input type="checkbox" class="equipment-toggle" {{ strtoupper($log->check_powersupply ?? '') === 'ON' ? 'checked' : '' }} aria-label="Check the power supply"></td>
+                                    <td><input type="hidden" name="switchon_equipment[]" class="toggle-value" value="{{ strtoupper($log->switchon_equipment ?? '') === 'ON' ? 'ON' : 'OFF' }}"><input type="checkbox" class="equipment-toggle" {{ strtoupper($log->switchon_equipment ?? '') === 'ON' ? 'checked' : '' }} aria-label="Switch on the equipment"></td>
+                                    <td><input type="hidden" name="shutdown_equipment[]" class="toggle-value" value="{{ strtoupper($log->shutdown_equipment ?? '') === 'ON' ? 'ON' : 'OFF' }}"><input type="checkbox" class="equipment-toggle" {{ strtoupper($log->shutdown_equipment ?? '') === 'ON' ? 'checked' : '' }} aria-label="Shut down the equipment"></td>
                                     <td><input type="text" name="preventive_maintenance[]" value="{{ $log->preventive_maintenance ?? '' }}" class="form-control-plain"></td>
                                     <td><input type="text" name="name_analyst[]" value="{{ $log->name_analyst ?? '' }}" class="form-control-plain"></td>
                                     <td>
@@ -350,18 +438,22 @@
                                             class="form-control-plain">
                                     </td>
 
-                                    <td>
-                                        <input type="text"
-                                            name="RLA_no[]"
-                                            value="{{ $log->RLA_no ?? '' }}"
-                                            class="form-control-plain">
-                                    </td>
+                                    <td><input type="text" name="RLA_no[]" value="{{ $log->RLA_no ?? '' }}" class="form-control-plain rla-no" readonly></td>
 
                                     <td>
-                                        <input type="text"
-                                            name="laboratory_code[]"
-                                            value="{{ $log && $log->laboratory_code ? collect(json_decode($log->laboratory_code, true))->flatten()->implode(', ') : '' }}"
-                                            class="form-control-plain">
+                                        @php
+                                            $savedLaboratoryCode = $log->laboratory_code ?? '';
+                                            $decodedLaboratoryCode = json_decode($savedLaboratoryCode, true);
+                                            if (is_array($decodedLaboratoryCode)) {
+                                                $savedLaboratoryCode = collect($decodedLaboratoryCode)->flatten()->first() ?? '';
+                                            }
+                                        @endphp
+                                        <select name="laboratory_code[]" class="form-control-plain laboratory-code-select">
+                                            <option value="">Select code</option>
+                                            @foreach($laboratoryCodeOptions as $option)
+                                                <option value="{{ $option['code'] }}" data-rla-no="{{ $option['rla_no'] }}" {{ $option['code'] === $savedLaboratoryCode ? 'selected' : '' }}>{{ $option['code'] }}</option>
+                                            @endforeach
+                                        </select>
                                     </td>
                                     <td><input type="text" name="remarks[]" value="{{ $log->remarks ?? '' }}" class="form-control-plain"></td>
                                     <td class="text-center align-middle no-print-export" >
@@ -376,7 +468,8 @@
                                         </a>
                                     </td>
                                 </tr>
-                            @endfor
+                                @endforeach
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -384,7 +477,7 @@
                 <!-- BUTTONS -->
                 <div class="btn-row screen-only">
                     <button type="button" id="addRow" class="btn btn-primary btn-sm">+ Add Row</button>
-                    <button type="submit" class="btn btn-success btn-sm">                            <svg class="icon-32" width="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">                            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 22C6.48 22 2 17.51 2 12C2 6.48 6.48 2 12 2C17.51 2 22 6.48 22 12C22 17.51 17.51 22 12 22ZM16 10.02C15.7 9.73 15.23 9.73 14.94 10.03L12 12.98L9.06 10.03C8.77 9.73 8.29 9.73 8 10.02C7.7 10.32 7.7 10.79 8 11.08L11.47 14.57C11.61 14.71 11.8 14.79 12 14.79C12.2 14.79 12.39 14.71 12.53 14.57L16 11.08C16.15 10.94 16.22 10.75 16.22 10.56C16.22 10.36 16.15 10.17 16 10.02Z" fill="currentColor"></path>                            </svg>                        Save</button>
+                    <button type="submit" class="btn btn-success btn-sm" {{ !$hasSelectedPeriod ? 'disabled' : '' }}>                            <svg class="icon-32" width="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">                            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 22C6.48 22 2 17.51 2 12C2 6.48 6.48 2 12 2C17.51 2 22 6.48 22 12C22 17.51 17.51 22 12 22ZM16 10.02C15.7 9.73 15.23 9.73 14.94 10.03L12 12.98L9.06 10.03C8.77 9.73 8.29 9.73 8 10.02C7.7 10.32 7.7 10.79 8 11.08L11.47 14.57C11.61 14.71 11.8 14.79 12 14.79C12.2 14.79 12.39 14.71 12.53 14.57L16 11.08C16.15 10.94 16.22 10.75 16.22 10.56C16.22 10.36 16.15 10.17 16 10.02Z" fill="currentColor"></path>                            </svg>                        Save</button>
                     <button type="button" id="printPdf" class="btn btn-danger btn-sm">                                                        <svg class="icon-32" width="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">                            <path d="M11.2301 7.29052V3.2815C11.2301 2.85523 11.5701 2.5 12.0001 2.5C12.3851 2.5 12.7113 2.79849 12.763 3.17658L12.7701 3.2815V7.29052L17.55 7.29083C19.93 7.29083 21.8853 9.23978 21.9951 11.6704L22 11.8861V16.9254C22 19.373 20.1127 21.3822 17.768 21.495L17.56 21.5H6.44C4.06 21.5 2.11409 19.5608 2.00484 17.1213L2 16.9047L2 11.8758C2 9.4281 3.87791 7.40921 6.22199 7.29585L6.43 7.29083H11.23V13.6932L9.63 12.041C9.33 11.7312 8.84 11.7312 8.54 12.041C8.39 12.1959 8.32 12.4024 8.32 12.6089C8.32 12.7659 8.3648 12.9295 8.45952 13.0679L8.54 13.1666L11.45 16.1819C11.59 16.3368 11.79 16.4194 12 16.4194C12.1667 16.4194 12.3333 16.362 12.4653 16.2533L12.54 16.1819L15.45 13.1666C15.75 12.8568 15.75 12.3508 15.45 12.041C15.1773 11.7594 14.7475 11.7338 14.4462 11.9642L14.36 12.041L12.77 13.6932V7.29083L11.2301 7.29052Z" fill="currentColor"></path>                            </svg>                                               Print PDF</button>
                 </div>
 
@@ -533,22 +626,45 @@
 
 
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const periodModal = document.getElementById('periodModal');
+
+    if (periodModal && !{{ $hasSelectedPeriod ? 'true' : 'false' }} && window.bootstrap) {
+        bootstrap.Modal.getOrCreateInstance(periodModal).show();
+    }
+});
+
 document.getElementById('addRow').addEventListener('click', function () {
+    const selectedPeriod = '{{ $hasSelectedPeriod ? sprintf('%04d-%02d', $selectedYear, $selectedMonth) : '' }}';
+    const laboratoryCodeOptions = @json($laboratoryCodeOptions);
+
+    if (!selectedPeriod) {
+        alert('Select a month and year before adding a log row.');
+        return;
+    }
+
+    document.getElementById('noDataMessage')?.remove();
+
     let row = `
         <tr>
             <td>
                 <input type="hidden" name="log_id[]" value="" class="no-print-export">
-                <input type="date" name="date[]" class="form-control-plain">
+                <input type="number" name="date[]" class="form-control-plain" min="1" max="31" step="1" placeholder="Day">
             </td>
-            <td><input type="text" name="clean_equipment[]" class="form-control-plain"></td>
-            <td><input type="text" name="check_powersupply[]" class="form-control-plain"></td>
-            <td><input type="text" name="switchon_equipment[]" class="form-control-plain"></td>
-            <td><input type="text" name="shutdown_equipment[]" class="form-control-plain"></td>
+            <td><input type="hidden" name="clean_equipment[]" class="toggle-value" value="OFF"><input type="checkbox" class="equipment-toggle" aria-label="Clean the equipment"></td>
+            <td><input type="hidden" name="check_powersupply[]" class="toggle-value" value="OFF"><input type="checkbox" class="equipment-toggle" aria-label="Check the power supply"></td>
+            <td><input type="hidden" name="switchon_equipment[]" class="toggle-value" value="OFF"><input type="checkbox" class="equipment-toggle" aria-label="Switch on the equipment"></td>
+            <td><input type="hidden" name="shutdown_equipment[]" class="toggle-value" value="OFF"><input type="checkbox" class="equipment-toggle" aria-label="Shut down the equipment"></td>
             <td><input type="text" name="preventive_maintenance[]" class="form-control-plain"></td>
             <td><input type="text" name="name_analyst[]" class="form-control-plain"></td>
             <td><input type="text" name="analysis[]" class="form-control-plain"></td>
-            <td><input type="text" name="RLA_no[]" class="form-control-plain"></td>
-            <td><input type="text" name="laboratory_code[]" class="form-control-plain"></td>
+            <td><input type="text" name="RLA_no[]" class="form-control-plain rla-no" readonly></td>
+            <td>
+                <select name="laboratory_code[]" class="form-control-plain laboratory-code-select">
+                    <option value="">Select code</option>
+                    ${laboratoryCodeOptions.map(option => `<option value="${option.code}" data-rla-no="${option.rla_no}">${option.code}</option>`).join('')}
+                </select>
+            </td>
             <td><input type="text" name="remarks[]" class="form-control-plain"></td>
             <td class="text-center align-middle">
                   <a class="btn btn-sm btn-icon btn-danger removeRow" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Delete" data-bs-original-title="Delete">
@@ -570,6 +686,18 @@ document.getElementById('addRow').addEventListener('click', function () {
 document.addEventListener('click', function(e){
     if(e.target.classList.contains('removeRow')){
         e.target.closest('tr').remove();
+    }
+});
+
+document.addEventListener('change', function (event) {
+    if (event.target.classList.contains('equipment-toggle')) {
+        event.target.previousElementSibling.value = event.target.checked ? 'ON' : 'OFF';
+    }
+
+    if (event.target.classList.contains('laboratory-code-select')) {
+        const row = event.target.closest('tr');
+        const selectedOption = event.target.options[event.target.selectedIndex];
+        row.querySelector('.rla-no').value = selectedOption?.dataset.rlaNo || '';
     }
 });
 </script>

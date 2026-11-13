@@ -531,7 +531,7 @@
                             </a>
                         </div>
                         <div class="card-body ">
-                            <input type="text" id="searchInput" style="width: 50%"  placeholder="Search Document Code or Title" class="form-control mb-3">
+                            <input type="search" id="searchInput" data-table-search="#documentsTable" style="width: 50%" placeholder="Search RLA, laboratory code, or customer" class="form-control mb-3">
                             
 
                             <div class="table-responsive">
@@ -540,22 +540,22 @@
                                         <tr class="light">
                                             <th class="text-wrap">RLA NO.</th>
                                             <th class="text-wrap">Customer Name</th>
-                                            <th class="text-wrap">Address</th>
+                                            {{-- <th class="text-wrap">Address</th> --}}
                                             <th class="text-wrap">Sample</th>
                                             <th class="text-wrap">Date Collected</th>
                                             <th class="text-wrap">Payment</th>
-                                            <th class="text-wrap">Status</th>
+                                            {{-- <th class="text-wrap">Status</th> --}}
                                             <th style="text-wrap">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($rla as $r)
-                                             <tr>
+                                             <tr data-search="{{ $r->laboratory_code ?? '' }}">
                                             
                                                 <td class="text-wrap">{{ $r->RLA_no}}</td>
                                                 <td class="text-wrap">{{ $r->company_name}}</td>
-                                                <td class="text-wrap">{{ $r->display_address ?? $r->address ?? '' }}</td>
-                                                <td class="text-wrap">{{ $r->source_sample}}</td>
+                                                {{-- <td class="text-wrap">{{ $r->display_address ?? $r->address ?? '' }}</td> --}}
+                                                <td class="text-wrap">{{ $r->sample_description ?? '' }}</td>
                                                 <td class="text-wrap">{{ $r->date_collected}}</td>
                                                  <td class="text-wrap">{{ $r->payment}}</td>
                                                <style>
@@ -613,105 +613,205 @@
                                                     }
                                                 </style>
                                                 @php
-                                                    $statuses = [
-                                                        0 => ['label' => 'On Process', 'class' => 'bg-secondary'],
-                                                        1 => ['label' => 'Order of Payment', 'class' => 'bg-primary'],
-                                                        2 => ['label' => 'Job Routing Form', 'class' => 'bg-info'],
-                                                        3 => ['label' => 'Analysis Worksheet', 'class' => 'bg-secondary'],
-                                                        4 => ['label' => 'Equipment Logs', 'class' => 'bg-secondary'],
-                                                        5 => ['label' => 'ENVIRONMENTAL MONITORING LOGBOOK', 'class' => 'bg-secondary'],
-                                                        6 => ['label' => 'Sample Disposal Logs', 'class' => 'bg-info'],
-                                                        7 => ['label' => 'Preparation Report Test', 'class' => 'bg-warning'],
-                                                        8 => ['label' => 'Release', 'class' => 'bg-success'],
-                                                    ];
+                                                $statuses = [
+                                                    0 => ['label' => 'On Process', 'class' => 'bg-secondary'],
+                                                    1 => ['label' => 'Order of Payment', 'class' => 'bg-primary'],
+                                                    2 => ['label' => 'Job Routing Form', 'class' => 'bg-info'],
+                                                    3 => ['label' => 'Analysis Worksheet', 'class' => 'bg-secondary'],
+                                                    4 => ['label' => 'Equipment Logs', 'class' => 'bg-secondary'],
+                                                    5 => ['label' => 'ENVIRONMENTAL MONITORING LOGBOOK', 'class' => 'bg-secondary'],
+                                                    6 => ['label' => 'Sample Disposal Logs', 'class' => 'bg-info'],
+                                                    7 => ['label' => 'Preparation Report Test', 'class' => 'bg-warning'],
+                                                    8 => ['label' => 'Release', 'class' => 'bg-success'],
+                                                ];
 
-                                                    $currentStatus = $statuses[$r->status] ?? ['label' => 'Hold', 'class' => 'bg-danger'];
-                                                @endphp
+                                                /*
+                                                |--------------------------------------------------------------------------
+                                                | Get all laboratory statuses with the same RLA No.
+                                                |--------------------------------------------------------------------------
+                                                */
 
-                                                <td>
-                                                    <!-- CLICKABLE BADGE -->
-                                                    <button type="button"
-                                                        class="badge {{ $currentStatus['class'] }} p-2 border-0"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#statusModal{{ $r->id }}">
-                                                        {{ $currentStatus['label'] }}
-                                                    </button>
+                                                $rlaLaboratoryStatuses = $laboratoryStatuses[$r->RLA_no] ?? collect();
 
-                                                    <!-- MODAL -->
-                                                    <div class="modal fade" id="statusModal{{ $r->id }}" tabindex="-1">
-                                                        <div class="modal-dialog modal-dialog-centered">
-                                                            <div class="modal-content">
+                                                /*
+                                                |--------------------------------------------------------------------------
+                                                | Get the highest status
+                                                |--------------------------------------------------------------------------
+                                                */
 
-                                                                <!-- HEADER -->
-                                                                <div class="modal-header bg-success text-white">
-                                                                    <h5 class="modal-title">Status Progress</h5>
-                                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                                </div>
+                                                $currentStatusNumber = $rlaLaboratoryStatuses->isNotEmpty()
+                                                    ? $rlaLaboratoryStatuses->max('status')
+                                                    : 0;
 
-                                                                <!-- BODY -->
-                                                                <div class="modal-body">
+                                                /*
+                                                |--------------------------------------------------------------------------
+                                                | Get status label and class
+                                                |--------------------------------------------------------------------------
+                                                */
 
-                                                                    <h6 class="mb-3">
-                                                                        Current Status:
-                                                                        <span class="badge {{ $currentStatus['class'] }}">
-                                                                            {{ $currentStatus['label'] }}
-                                                                        </span>
-                                                                    </h6>
+                                                $currentStatus = $statuses[$currentStatusNumber]
+                                                    ?? ['label' => 'Hold', 'class' => 'bg-danger'];
+                                            @endphp
+{{-- 
+                                            <td>
 
-                                                                    <!-- TIMELINE -->
-                                                                    @foreach($statuses as $key => $status)
-                                                                        <div class="timeline-item">
+                                                <!-- CLICKABLE BADGE -->
+                                                <button type="button"
+                                                    class="badge {{ $currentStatus['class'] }} p-2 border-0"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#statusModal{{ $r->id }}">
 
-                                                                            <!-- CIRCLE -->
-                                                                            <div class="timeline-icon
-                                                                                {{ $r->status > $key ? 'done' : '' }}
-                                                                                {{ $r->status == $key ? 'current' : '' }}">
-                                                                                {{ $key + 1 }}
-                                                                            </div>
+                                                    {{ $currentStatus['label'] }}
 
-                                                                            <!-- CONTENT -->
-                                                                            <div class="timeline-content">
-                                                                                <strong>{{ $status['label'] }}</strong><br>
+                                                </button>
 
-                                                                                @if($r->status > $key)
-                                                                                    <small class="text-success">Completed</small>
-                                                                                @elseif($r->status == $key)
-                                                                                    <small class="text-primary">Current step</small>
-                                                                                @else
-                                                                                    <small class="text-muted">Pending</small>
-                                                                                @endif
-                                                                            </div>
 
-                                                                        </div>
-                                                                    @endforeach
+                                                <!-- MODAL -->
+                                                <div class="modal fade"
+                                                    id="statusModal{{ $r->id }}"
+                                                    tabindex="-1">
 
-                                                                    @if(!array_key_exists($r->status, $statuses))
-                                                                        <div class="alert alert-danger mt-3">
-                                                                            This request is currently on hold.
-                                                                        </div>
-                                                                    @endif
+                                                    <div class="modal-dialog modal-dialog-centered">
 
-                                                                </div>
+                                                        <div class="modal-content">
+
+                                                            <!-- HEADER -->
+                                                            <div class="modal-header bg-success text-white">
+
+                                                                <h5 class="modal-title">
+                                                                    Status Progress
+                                                                </h5>
+
+                                                                <button type="button"
+                                                                    class="btn-close btn-close-white"
+                                                                    data-bs-dismiss="modal">
+                                                                </button>
 
                                                             </div>
+
+
+                                                            <!-- BODY -->
+                                                            <div class="modal-body">
+
+                                                                <h6 class="mb-3">
+
+                                                                    Current Status:
+
+                                                                    <span class="badge {{ $currentStatus['class'] }}">
+
+                                                                        {{ $currentStatus['label'] }}
+
+                                                                    </span>
+
+                                                                </h6>
+
+
+                                                                <!-- TIMELINE -->
+                                                                @foreach($statuses as $key => $status)
+
+                                                                    <div class="timeline-item">
+
+                                                                        <!-- CIRCLE -->
+                                                                        <div class="timeline-icon
+                                                                            {{ $currentStatusNumber > $key ? 'done' : '' }}
+                                                                            {{ $currentStatusNumber == $key ? 'current' : '' }}">
+
+                                                                            {{ $key + 1 }}
+
+                                                                        </div>
+
+
+                                                                        <!-- CONTENT -->
+                                                                        <div class="timeline-content">
+
+                                                                            <strong>
+                                                                                {{ $status['label'] }}
+                                                                            </strong>
+
+                                                                            <br>
+
+
+                                                                            @if($currentStatusNumber > $key)
+
+                                                                                <small class="text-success">
+                                                                                    Completed
+                                                                                </small>
+
+                                                                            @elseif($currentStatusNumber == $key)
+
+                                                                                <small class="text-primary">
+                                                                                    Current step
+                                                                                </small>
+
+                                                                            @else
+
+                                                                                <small class="text-muted">
+                                                                                    Pending
+                                                                                </small>
+
+                                                                            @endif
+
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                @endforeach
+
+
+                                                                @if(!array_key_exists($currentStatusNumber, $statuses))
+
+                                                                    <div class="alert alert-danger mt-3">
+                                                                        This request is currently on hold.
+                                                                    </div>
+
+                                                                @endif
+
+                                                            </div>
+
                                                         </div>
+
                                                     </div>
-                                                </td>
+
+                                                </div>
+
+                                                </td> --}}
                                                 {{-- <td>Page 1</td> --}}
                                                 <td class="text-wrap">
-                                                    @php
-                                                        $isDisabled = $r->status != 0 && $r->status != 1;
-                                                        $isDisableds = $r->status != 0;
+                                                   @php
+                                                  
+                                                        $rlaLaboratoryStatuses = $laboratoryStatuses[$r->RLA_no] ?? collect();
+
+                                                        $currentStatusNumber = $rlaLaboratoryStatuses->isNotEmpty()
+                                                            ? $rlaLaboratoryStatuses->max('status')
+                                                            : 0;
+                                                        $isDisabled = $currentStatusNumber != 0 && $currentStatusNumber != 1;
+
+                                                        $isDisableds = $currentStatusNumber != 0;
                                                     @endphp
                                                     <div class="flex align-items-center list-user-action">
-                                                        <a class="btn btn-sm btn-icon btn-warning editRlaBtn {{ $isDisabled ? 'disabled' : '' }}"
+                                                        {{-- <a class="btn btn-sm btn-icon btn-warning editRlaBtn "
                                                             href="javascript:void(0);"
                                                             data-bs-toggle="{{ $isDisabled ? '' : 'modal' }}"
-                                                            data-bs-target="{{ $isDisabled ? '' : '#editRLAModal' }}"
+                                                            data-bs-target="{{ $isDisabled ? '' : '#editRLAModal' }}" 
                                                             data-id="{{ $r->id }}"
                                                             style="{{ $isDisabled ? 'pointer-events:none; opacity:0.6;' : '' }}"
                                                             title="Edit"
                                                             aria-label="Edit">
+                                                                <span class="btn-inner">
+                                                                    <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M11.4925 2.78906H7.75349C4.67849 2.78906 2.75049 4.96606 2.75049 8.04806V16.3621C2.75049 19.4441 4.66949 21.6211 7.75349 21.6211H16.5775C19.6625 21.6211 21.5815 19.4441 21.5815 16.3621V12.3341" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.82812 10.921L16.3011 3.44799C17.2321 2.51799 18.7411 2.51799 19.6721 3.44799L20.8891 4.66499C21.8201 5.59599 21.8201 7.10599 20.8891 8.03599L13.3801 15.545C12.9731 15.952 12.4211 16.181 11.8451 16.181H8.09912L8.19312 12.401C8.20712 11.845 8.43412 11.315 8.82812 10.921Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                                        <path d="M15.1655 4.60254L19.7315 9.16854" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                                    </svg>
+                                                                </span>
+                                                            </a> --}}
+                                                            <a class="btn btn-sm btn-icon btn-warning editRlaBtn"
+                                                                href="javascript:void(0);"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#editRLAModal"
+                                                                data-id="{{ $r->id }}"
+                                                                title="Edit"
+                                                                aria-label="Edit">
                                                                 <span class="btn-inner">
                                                                     <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <path d="M11.4925 2.78906H7.75349C4.67849 2.78906 2.75049 4.96606 2.75049 8.04806V16.3621C2.75049 19.4441 4.66949 21.6211 7.75349 21.6211H16.5775C19.6625 21.6211 21.5815 19.4441 21.5815 16.3621V12.3341" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -1197,9 +1297,10 @@
                             <table class="table table-bordered" id="sampleTable" style="border: #000;">
                                 <tr style="text-align:center; font-weight:bold;">
                                     <td class="text-wrap" style="width: 300px">Laboratory Code</td>
+                                    <td class="text-wrap" style="width: 300px">Lab Unit</td>
                                     <td class="text-wrap" style="width: 300px">Sample Description</td>
                                     <td class="text-wrap" style="width: 300px">Sample Code</td>
-                                    <td class="text-wrap" style="width: 300px">Lab Unit</td>
+                                    
                                     <td class="text-wrap" style="width: 300px">Analysis Description</td>
                                     <td class="text-wrap" style="width: 300px">Analysis Requested</td>
                                     <td class="text-wrap" style="width: 300px">Test Method</td>
@@ -1214,22 +1315,7 @@
                                             style="width: 200px"
                                             readonly>
                                     </td>
-
-                                    <td>
-                                        <input type="text"
-                                            name="sample_description[]"
-                                            class="form-control sample_description"
-                                            style="width: 200px">
-                                    </td>
-
-                                    <td>
-                                        <input type="text"
-                                            name="sample_code[]"
-                                            class="form-control sample_code"
-                                            style="width: 200px">
-                                    </td>
-
-                                    <td>
+                                      <td>
                                         <select name="lab_unit[]" class="form-control lab_unit" style="width: 200px">
                                             <option value="">Select Lab Unit</option>
                                             <option value="FIS">FIS</option>
@@ -1237,6 +1323,232 @@
                                             <option value="MIC">MIC</option>
                                         </select>
                                     </td>
+                                   <td>
+                                    <select name="sample_description[]" class="form-control sample_description" style="width:250px;">
+                                       
+                                        <option value="">Select Sample Description</option>
+                                    </select>
+                                </td>
+                                <script>
+                                    $('.sample_description').each(function () {
+                                        this.choicesInstance = new Choices(this, {
+                                            searchEnabled: true,
+                                            addItems: true,
+                                            addChoices: true,
+                                            duplicateItemsAllowed: false,
+                                            itemSelectText: '',
+                                            shouldSort: false,
+                                            searchPlaceholderValue: 'Search or type Sample Description...',
+                                            placeholderValue: 'Select Sample Description'
+                                        });
+                                    });
+
+
+                                    const sampleDescriptions = {
+
+                                        CHEM: [
+                                            "C.O Treated Frozen Yellowfin Tuna (Thunnus albacares)",
+                                            "Panga (Thunnus albacares)",
+                                            "Frozen Yellowfin Cubes Handcut (Thunnus albacares)",
+                                            "Bonito Rawmat (Sarda sarda)",
+                                            "Frozen Tuna Bloodmeat (Thunnus albacares)",
+                                            "Mackerel (Scomber scombrus)",
+                                            "Skipjack Tuna (Katsuwonus pelamis)",
+                                            "Frozen Cooked Tuna Loins (Katsuwonus pelamis)",
+                                            "Frozen Yellowfin Tuna (Thunnus albacares)",
+                                            "Water"
+                                        ],
+
+                                        FIS: [
+                                            "Crab (Scylla serrata)",
+                                            "Crablets (Scylla serrata)",
+                                            "Shrimp fry (L. vannamei)",
+                                            "Polychaete (Polychaeta)",
+                                            "Live Tilapia Fingerlings (Oreochromis niloticus)"
+                                        ],
+
+                                        MIC: [
+                                            "Pangasius Fillet",
+                                            "Bullet Tuna",
+                                            "Frozen Yellowfin Tuna",
+                                            "Fermented Duck Mussel",
+                                            "Frozen Cooked Tuna Loins Skipjack",
+                                            "Tuna Panga",
+                                            "Tuna Tail",
+                                            "Nile Tilapia",
+                                            "Skipjack Tuna",
+                                            "Water",
+                                            "ICE"
+                                        ]
+
+                                    };
+
+
+                                    $(document).on('change', '.lab_unit', function () {
+
+                                        let row = $(this).closest('tr');
+                                        let select = row.find('.sample_description')[0];
+                                        let lab = $(this).val();
+
+
+                                        if (select.choicesInstance) {
+                                            select.choicesInstance.destroy();
+                                        }
+
+
+                                        select.innerHTML = '<option value="">Select Sample Description</option>';
+
+
+                                        if(sampleDescriptions[lab]) {
+
+                                            sampleDescriptions[lab].forEach(function(item){
+
+                                                let option = document.createElement('option');
+
+                                                option.value = item;
+                                                option.text = item;
+
+                                                select.appendChild(option);
+
+                                            });
+
+                                        }
+
+
+                                        select.choicesInstance = new Choices(select, {
+
+                                            searchEnabled: true,
+
+                                            // ALLOW MANUAL INPUT
+                                            addItems: true,
+                                            addChoices: true,
+
+                                            duplicateItemsAllowed: false,
+
+                                            itemSelectText: '',
+
+                                            shouldSort: false,
+
+                                            searchPlaceholderValue: 'Search or type Sample Description...',
+
+                                            placeholderValue: 'Select Sample Description'
+
+                                        });
+
+
+                                    });
+                                    </script>
+                                {{-- <script>
+                                    $('.sample_description').each(function () {
+                                            this.choicesInstance = new Choices(this, {
+                                                searchEnabled: true,
+                                                itemSelectText: '',
+                                                shouldSort: false,
+                                                searchPlaceholderValue: 'Search Sample Description...',
+                                                placeholderValue: 'Select Sample Description'
+                                            });
+                                        });
+                                        const sampleDescriptions = {
+                                            CHEM: [
+                                                "C.O Treated Frozen Yellowfin Tuna (Thunnus albacares)",
+                                                "Panga (Thunnus albacares)",
+                                                "Frozen Yellowfin Cubes Handcut (Thunnus albacares)",
+                                                "Bonito Rawmat (Sarda sarda)",
+                                                "Frozen Tuna Bloodmeat (Thunnus albacares)",
+                                                "Mackerel (Scomber scombrus)",
+                                                "Skipjack Tuna (Katsuwonus pelamis)",
+                                                "Frozen Cooked Tuna Loins (Katsuwonus pelamis)",
+                                                "Frozen Yellowfin Tuna (Thunnus albacares)",
+                                                "Yellowfin Tuna Product Roe (Thunnus albacares)",
+                                                "Snack Bar Seaweeds Powder (Eucheuma cottonii)",
+                                                "Milkfish (Chanos chanos) Bone Dough",
+                                                "Shrimp fry (L. vannamei) Kropek Crackers",
+                                                "Dried Smoke Fish Skipjack (Katsuwonus pelamis)",
+                                                "Pond Water",
+                                                "Lake Water",
+                                                "Water"
+                                            ],
+
+                                            FIS: [
+                                                "Crab (Scylla serrata)",
+                                                "Crablets (Scylla serrata)",
+                                                "Shrimp fry (L. vannamei)",
+                                                "Polychaete (Polychaeta)",
+                                                "Live Tilapia Fingerlings (Oreochromis niloticus)"
+                                            ],
+
+                                            MIC: [
+                                                "Pangasius Fillet",
+                                                "Bullet Tuna",
+                                                "Frozen Yellowfin Tuna",
+                                                "Fermented Duck Mussel",
+                                                "Frozen Cooked Tuna Loins Skipjack",
+                                                "Tuna Panga",
+                                                "Tuna Tail",
+                                                "Nile Tilapia",
+                                                "Skipjack Tuna",
+                                                "Frozen Cooked Octopus Sliced",
+                                                "Tuna Entrails",
+                                                "Mud Clam",
+                                                "Carp",
+                                                "Fresh Frozen Yellowfin Tuna Fillet",
+                                                "Tuna Siomai",
+                                                "Tuna Sisig",
+                                                "Tuna Skin Pop (Regular)",
+                                                "Tuna Skin Pop (Hot & Spicy)",
+                                                "Tuna Skin Pop (Salted Egg)",
+                                                "Tuna Belly",
+                                                "Tuna Cubes",
+                                                "Tuna Crazy Cut",
+                                                "Tuna Steak",
+                                                "Frozen White Shrimp",
+                                                "Yellowfin Tuna Crazy Cut",
+                                                "Milkfish Cut",
+                                                "Pond Water",
+                                                "Water",
+                                                "ICE"
+                                            ]
+                                        };
+
+                                        $(document).on('change', '.lab_unit', function () {
+
+                                            let row = $(this).closest('tr');
+                                            let select = row.find('.sample_description')[0];
+                                            let lab = $(this).val();
+
+                                            if (select.choicesInstance) {
+                                                select.choicesInstance.destroy();
+                                            }
+
+                                            select.innerHTML = '<option value="">Select Sample Description</option>';
+
+                                            if (sampleDescriptions[lab]) {
+                                                sampleDescriptions[lab].forEach(function(item){
+                                                    let option = document.createElement('option');
+                                                    option.value = item;
+                                                    option.text = item;
+                                                    select.appendChild(option);
+                                                });
+                                            }
+
+                                            select.choicesInstance = new Choices(select, {
+                                                searchEnabled: true,
+                                                searchPlaceholderValue: 'Search Sample...',
+                                                placeholderValue: 'Select Sample Description',
+                                                shouldSort: false,
+                                                itemSelectText: ''
+                                            });
+
+                                        });
+                                </script> --}}
+                                    <td>
+                                        <input type="text"
+                                            name="sample_code[]"
+                                            class="form-control"
+                                            style="width: 200px">
+                                    </td>
+
+                                  
 
                                     <td>
                                         <select name="analysis_description[]"
@@ -1655,15 +1967,19 @@
                                             style="width: 200px"
                                             readonly>
                                     </td>
-
-                                    <td>
-                                        <input type="text"
-                                            name="sample_description[]"
-                                            class="form-control sample_description"
-                                            style="width: 200px"
-                                            value="${escapeHtml(sourceSampleDescription)}">
+                                  <td>
+                                        <select name="lab_unit[]" class="form-control lab_unit" style="width:200px">
+                                            <option value="">Select Lab Unit</option>
+                                            <option value="FIS">FIS</option>
+                                            <option value="CHEM">CHEM</option>
+                                            <option value="MIC">MIC</option>
+                                        </select>
                                     </td>
 
+                                    <td>
+                                        <select name="sample_description[]" class="form-control sample_description" style="width:250px;">
+                                        </select>
+                                    </td>
                                     <td>
                                         <input type="text"
                                             name="sample_code[]"
@@ -1672,14 +1988,7 @@
                                             value="${escapeHtml(sourceSampleCode)}">
                                     </td>
 
-                                    <td>
-                                        <select name="lab_unit[]" class="form-control lab_unit" style="width: 200px">
-                                            <option value="">Select Lab Unit</option>
-                                            <option value="FIS">FIS</option>
-                                            <option value="CHEM">CHEM</option>
-                                            <option value="MIC">MIC</option>
-                                        </select>
-                                    </td>
+                                   
 
                                     <td>
                                         <select name="analysis_description[]"
@@ -1725,7 +2034,22 @@
                                 let newRequestSelect = newRow.querySelector('.analysis_requested');
 
                                 newLabUnitSelect.value = sourceLabUnit;
+                                const sourceSampleSelect = sourceRow.querySelector('.sample_description');
+                                const newSampleSelect = newRow.querySelector('.sample_description');
 
+                                
+                                newSampleSelect.innerHTML = sourceSampleSelect.innerHTML;
+
+                                
+                                newSampleSelect.value = sourceSampleSelect.value;
+
+                                newSampleSelect.choicesInstance = new Choices(newSampleSelect, {
+                                    searchEnabled: true,
+                                    itemSelectText: '',
+                                    shouldSort: false,
+                                    searchPlaceholderValue: 'Search Sample Description...',
+                                    placeholderValue: 'Select Sample Description'
+                                });
                                 if (sourceDescriptionSelect) {
                                     copyOptionsAndSelected(sourceDescriptionSelect, newDescriptionSelect);
                                     newDescriptionSelect.value = sourceDescriptionValue;
@@ -1882,10 +2206,8 @@
 
                                             <br><br>
                                         </td>
-
                                         <script>
                                             $(document).ready(function () {
-
                                                 const roleDescriptions = {
                                                     0: 'Laboratory Manager',
                                                     1: 'Quality Assurance Manager',
@@ -1971,7 +2293,7 @@
                                         data-bs-target="#termsCollapse"
                                         aria-expanded="false"
                                         aria-controls="termsCollapse">
-                                    <span id="termsArrow">▶</span>
+                                    <span id="termsArrow"> -> </span>
                                 </button>
                                     </div>
                                     <style>
@@ -2165,10 +2487,18 @@
                                                 <li>
                                                     To facilitate the retrieval of tested samples kindly note your intention below:
 
-                                                    <div class="mt-2">
-                                                        _____ The customer will retrieve the retained sample.<br>
-                                                        _____ The customer will not retrieve the retained sample.
-                                                    </div>
+                                                  <div class="mt-2">
+                                                    <label>
+                                                        <input type="radio" name="retrieve_sample" value="yes" required>
+                                                        The customer will retrieve the retained sample.
+                                                    </label>
+                                                    <br>
+
+                                                    <label>
+                                                        <input type="radio" name="retrieve_sample" value="no" required>
+                                                        The customer will not retrieve the retained sample.
+                                                    </label>
+                                                </div>
                                                 </li>
 
                                                 <li>
@@ -2189,7 +2519,7 @@
                                                 </li>
 
                                                 <li>
-                                                    The Official Test Report for the sample shall be released on ____________________, in accordance with
+                                                    The Official Test Report for the sample shall be released on <input type="date" class="form-control" id="release_date" name="release_date" style="width:150px">, in accordance with
                                                     the Work Schedule. For industry samples, official Report of Test shall not be released without the full
                                                     payment of testing fee. RFL12 shall not send official Report of Test through fax or e-mail unless otherwise
                                                     authorized by the Laboratory Manager.

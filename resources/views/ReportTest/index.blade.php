@@ -209,7 +209,7 @@
                             </a> --}}
                         </div>
                         <div class="card-body ">
-                            <input type="text" id="searchInput" style="width: 50%"  placeholder="Search Document Code or Title" class="form-control mb-3">
+                            <input type="search" id="searchInput" data-table-search="#documentsTable" style="width: 50%" placeholder="Search RLA, laboratory code, or customer" class="form-control mb-3">
                             
 
                             <div class="table-responsive">
@@ -218,10 +218,11 @@
                                         <tr class="light">
                                             <th class="text-wrap">RLA NO.</th>
                                             <th class="text-wrap">Customer Name</th>
-                                            <th class="text-wrap">Address</th>
+                                            {{-- <th class="text-wrap">Address</th> --}}
                                             <th class="text-wrap">Sample</th>
                                             <th class="text-wrap">Date Collected</th>
-                                            {{-- <th class="text-wrap">Payment</th>
+                                             <th class="text-wrap">Current Lab Code</th>
+                                            {{--
                                             <th class="text-wrap">Status</th> --}}
                                             <th class="text-wrap">Status</th>
                                             <th style="text-wrap">Action</th>
@@ -233,17 +234,38 @@
                                             
                                                 <td class="text-wrap">{{ $r->RLA_no}}</td>
                                                 <td class="text-wrap">{{ $r->company_name}}</td>
-                                                <td class="text-wrap">{{ $r->address}}</td>
-                                                <td class="text-wrap">{{ $r->source_sample}}</td>
+                                                {{-- <td class="text-wrap">{{ $r->address}}</td> --}}
+                                                <td class="text-wrap">
+                                                    @php
+                                                        $sampleDescriptions = is_array($r->sample_description)
+                                                            ? $r->sample_description
+                                                            : json_decode($r->sample_description ?? '[]', true);
+                                                    @endphp
+
+                                                    {{ $sampleDescriptions[0] ?? '' }}
+                                                </td>
                                                 <td class="text-wrap">{{ $r->date_collected}}</td>
+                                                 <td class="text-wrap">
+                                                    @forelse ($r->status8_laboratory_codes ?? [] as $labCode)
+
+                                                        <div>
+                                                            {{ $labCode }}
+                                                        </div>
+
+                                                    @empty
+
+                                                        <span class="text-muted">
+                                                            -
+                                                        </span>
+
+                                                    @endforelse
+                                                </td>
                                                  <style>
                                                      .timeline-item {
                                                         position: relative;
                                                         padding-left: 45px;
                                                         margin-bottom: 20px;
                                                     }
-
-                                                    /* 🔥 VERTICAL LINE */
                                                     .timeline-item::before {
                                                         content: "";
                                                         position: absolute;
@@ -253,13 +275,9 @@
                                                         height: 100%;
                                                         background: #dee2e6;
                                                     }
-
-                                                    /* remove last line */
                                                     .timeline-item:last-child::before {
                                                         height: 14px;
                                                     }
-
-                                                    /* 🔵 CIRCLE */
                                                     .timeline-icon {
                                                         position: absolute;
                                                         left: 0;
@@ -274,103 +292,193 @@
                                                         justify-content: center;
                                                         font-weight: bold;
                                                     }
-
-                                                    /* ✅ COMPLETED */
                                                     .timeline-icon.done {
                                                         background: #198754;
                                                     }
-
-                                                    /* 🔵 CURRENT */
                                                     .timeline-icon.current {
                                                         background: #0d6efd;
                                                     }
-
-                                                    /* TEXT */
                                                     .timeline-content {
                                                         padding-left: 5px;
                                                     }
                                                 </style>
                                                 @php
                                                     $statuses = [
-                                                        0 => ['label' => 'On Process', 'class' => 'bg-secondary'],
-                                                        1 => ['label' => 'Order of Payment', 'class' => 'bg-primary'],
-                                                        2 => ['label' => 'Job Routing Form', 'class' => 'bg-info'],
-                                                        3 => ['label' => 'Analysis Worksheet', 'class' => 'bg-secondary'],
-                                                        4 => ['label' => 'Equipment Logs', 'class' => 'bg-secondary'],
-                                                        5 => ['label' => 'ENVIRONMENTAL MONITORING LOGBOOK', 'class' => 'bg-secondary'],
-                                                        6 => ['label' => 'Sample Disposal Logs', 'class' => 'bg-info'],
-                                                        7 => ['label' => 'Preparation Report Test', 'class' => 'bg-warning'],
-                                                        8 => ['label' => 'Release', 'class' => 'bg-success'],
+                                                        0 => [
+                                                            'label' => 'On Process',
+                                                            'class' => 'bg-secondary'
+                                                        ],
+
+                                                        1 => [
+                                                            'label' => 'Order of Payment',
+                                                            'class' => 'bg-primary'
+                                                        ],
+
+                                                        2 => [
+                                                            'label' => 'Job Routing Form',
+                                                            'class' => 'bg-info'
+                                                        ],
+
+                                                        3 => [
+                                                            'label' => 'Analysis Worksheet',
+                                                            'class' => 'bg-secondary'
+                                                        ],
+
+                                                        4 => [
+                                                            'label' => 'Equipment Logs',
+                                                            'class' => 'bg-secondary'
+                                                        ],
+
+                                                        5 => [
+                                                            'label' => 'ENVIRONMENTAL MONITORING LOGBOOK',
+                                                            'class' => 'bg-secondary'
+                                                        ],
+
+                                                        6 => [
+                                                            'label' => 'Sample Disposal Logs',
+                                                            'class' => 'bg-info'
+                                                        ],
+
+                                                        7 => [
+                                                            'label' => 'Preparation Report Test',
+                                                            'class' => 'bg-warning'
+                                                        ],
+
+                                                        8 => [
+                                                            'label' => 'Release',
+                                                            'class' => 'bg-success'
+                                                        ],
                                                     ];
 
-                                                    $currentStatus = $statuses[$r->status] ?? ['label' => 'Hold', 'class' => 'bg-danger'];
+                                                    $currentStatus = $statuses[$r->status]
+                                                        ?? [
+                                                            'label' => 'Hold',
+                                                            'class' => 'bg-danger'
+                                                        ];
                                                 @endphp
 
                                                 <td>
+
                                                     <!-- CLICKABLE BADGE -->
-                                                    <button type="button"
+                                                    <button
+                                                        type="button"
                                                         class="badge {{ $currentStatus['class'] }} p-2 border-0"
                                                         data-bs-toggle="modal"
-                                                        data-bs-target="#statusModal{{ $r->id }}">
+                                                        data-bs-target="#statusModal{{ $r->id }}"
+                                                    >
                                                         {{ $currentStatus['label'] }}
                                                     </button>
 
+
                                                     <!-- MODAL -->
-                                                    <div class="modal fade" id="statusModal{{ $r->id }}" tabindex="-1">
+                                                    <div
+                                                        class="modal fade"
+                                                        id="statusModal{{ $r->id }}"
+                                                        tabindex="-1"
+                                                    >
+
                                                         <div class="modal-dialog modal-dialog-centered">
+
                                                             <div class="modal-content">
 
                                                                 <!-- HEADER -->
                                                                 <div class="modal-header bg-success text-white">
-                                                                    <h5 class="modal-title">Status Progress</h5>
-                                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
+                                                                    <h5 class="modal-title">
+                                                                        Status Progress
+                                                                    </h5>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        class="btn-close btn-close-white"
+                                                                        data-bs-dismiss="modal"
+                                                                    ></button>
+
                                                                 </div>
+
 
                                                                 <!-- BODY -->
                                                                 <div class="modal-body">
 
                                                                     <h6 class="mb-3">
+
                                                                         Current Status:
-                                                                        <span class="badge {{ $currentStatus['class'] }}">
+
+                                                                        <span
+                                                                            class="badge {{ $currentStatus['class'] }}"
+                                                                        >
                                                                             {{ $currentStatus['label'] }}
                                                                         </span>
+
                                                                     </h6>
+
+
+                                                                    @if($r->current_laboratory_code)
+
+                                                                        <div class="mb-3">
+
+                                                                            {{-- <strong>
+                                                                                Laboratory Code:
+                                                                            </strong>
+
+                                                                            {{ $r->current_laboratory_code }} --}}
+
+                                                                            @if($r->current_lab_unit)
+
+                                                                                <strong>
+                                                                                    Laboratory Unit:
+                                                                                </strong>
+
+                                                                                {{ $r->current_lab_unit }}
+
+                                                                            @endif
+
+                                                                        </div>
+
+                                                                    @endif
+
 
                                                                     <!-- TIMELINE -->
                                                                     @foreach($statuses as $key => $status)
+
                                                                         <div class="timeline-item">
 
                                                                             <!-- CIRCLE -->
-                                                                            <div class="timeline-icon
+                                                                            <div
+                                                                                class="timeline-icon
                                                                                 {{ $r->status > $key ? 'done' : '' }}
-                                                                                {{ $r->status == $key ? 'current' : '' }}">
+                                                                                {{ $r->status == $key ? 'current' : '' }}"
+                                                                            >
                                                                                 {{ $key + 1 }}
                                                                             </div>
-
                                                                             <!-- CONTENT -->
                                                                             <div class="timeline-content">
-                                                                                <strong>{{ $status['label'] }}</strong><br>
-
+                                                                                <strong>
+                                                                                    {{ $status['label'] }}
+                                                                                </strong>
+                                                                                <br>
                                                                                 @if($r->status > $key)
-                                                                                    <small class="text-success">Completed</small>
+                                                                                    <small class="text-success">
+                                                                                        Completed
+                                                                                    </small>
                                                                                 @elseif($r->status == $key)
-                                                                                    <small class="text-primary">Done</small>
+                                                                                    <small class="text-primary">
+                                                                                        Done
+                                                                                    </small>
                                                                                 @else
-                                                                                    <small class="text-muted">Pending</small>
+                                                                                    <small class="text-muted">
+                                                                                        Pending
+                                                                                    </small>
                                                                                 @endif
                                                                             </div>
-
                                                                         </div>
                                                                     @endforeach
-
                                                                     @if(!array_key_exists($r->status, $statuses))
                                                                         <div class="alert alert-danger mt-3">
                                                                             This request is currently on hold.
                                                                         </div>
                                                                     @endif
-
                                                                 </div>
-
                                                             </div>
                                                         </div>
                                                     </div>
@@ -435,7 +543,7 @@
                                                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                     <path d="M11.2301 7.29052V3.2815C11.2301 2.85523 11.5701 2.5 12.0001 2.5C12.3851 2.5 12.7113 2.79849 12.763 3.17658L12.7701 3.2815V7.29052L17.55 7.29083C19.93 7.29083 21.8853 9.23978 21.9951 11.6704L22 11.8861V16.9254C22 19.373 20.1127 21.3822 17.768 21.495L17.56 21.5H6.44C4.06 21.5 2.11409 19.5608 2.00484 17.1213L2 16.9047L2 11.8758C2 9.4281 3.87791 7.40921 6.22199 7.29585L6.43 7.29083H11.23V13.6932L9.63 12.041C9.33 11.7312 8.84 11.7312 8.54 12.041C8.39 12.1959 8.32 12.4024 8.32 12.6089C8.32 12.7659 8.3648 12.9295 8.45952 13.0679L8.54 13.1666L11.45 16.1819C11.59 16.3368 11.79 16.4194 12 16.4194C12.1667 16.4194 12.3333 16.362 12.4653 16.2533L12.54 16.1819L15.45 13.1666C15.75 12.8568 15.75 12.3508 15.45 12.041C15.1773 11.7594 14.7475 11.7338 14.4462 11.9642L14.36 12.041L12.77 13.6932V7.29083L11.2301 7.29052Z" fill="currentColor"></path>
                                                                 </svg>
-                                                            </span>
+                                                            </span> 
                                                         </a>
                                                       {{-- <button
                                                             type="button"

@@ -367,12 +367,14 @@
                 <td class="bold">{{ $labCode }}</td>
                 <td>{{ $sampleCode }}</td>
                 <td>{{ $sampleType }}</td>
-                <td>{{ $getMoistureResult($labCode) }}</td>
+
+                <td class="bold">
+                    {{ collect($analysisResultsByLabCode[$labCode] ?? [])->first() ?? '' }}
+                </td>
             </tr>
         @endforeach
     </tbody>
 </table>
-
 <div class="remarks">
     <strong>REMARKS:</strong>
     {{ $rla->remarks ?? 'Result is based on sample submitted.' }}<br>

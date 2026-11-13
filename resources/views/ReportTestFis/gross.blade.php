@@ -372,22 +372,43 @@
         </tr>
     </thead>
 
-    <tbody>
-        @foreach ($samples as $sample)
-            @php
-                $labCode = $displayValue($sample['lab_code'] ?? '');
-                $sampleCode = $displayValue($sample['sample_code'] ?? '');
-                $sampleType = $displayValue($sample['sample_type'] ?? '');
-            @endphp
+  <tbody>
+    @foreach ($samples as $sample)
+        @php
+            $labCode = $displayValue($sample['lab_code'] ?? '');
+            $sampleCode = $displayValue($sample['sample_code'] ?? '');
+            $sampleType = $displayValue($sample['sample_type'] ?? '');
 
-            <tr>
-                <td class="bold">{{ $labCode }}</td>
-                <td>{{ $sampleCode }}</td>
-                <td>{{ $sampleType }}</td>
-                <td>{{ $getResultValue($labCode) }}</td>
-            </tr>
-        @endforeach
-    </tbody>
+            // Results specific ONLY to this laboratory code
+            $labResults = $analysisResultsByLabCode[$labCode] ?? [];
+
+            $grossResult = '';
+
+            foreach ($labResults as $analysisName => $result) {
+                if (trim((string) $result) !== '') {
+                    $grossResult = $result;
+                    break;
+                }
+            }
+        @endphp
+
+        <tr>
+            <td class="bold">{{ $labCode }}</td>
+
+            <td>
+                {{ $sampleCode }}
+            </td>
+
+            <td>
+                {!! nl2br(e($sampleType)) !!}
+            </td>
+
+            <td class="bold">
+                {{ $grossResult }}
+            </td>
+        </tr>
+    @endforeach
+</tbody>
 </table>
 
 <div class="remarks">

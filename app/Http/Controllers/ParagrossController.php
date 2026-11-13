@@ -27,24 +27,18 @@ class ParagrossController extends Controller
         $data = [
             'lf_06_02_id' => $id,
             'user_id' => $request->user_id ?? $rla->user_id,
-
             'rla_no' => $request->rla_no ?? $rla->RLA_no,
             'lab_code' => $request->lab_code ?? $firstLabCode,
-
             'sample_type' => $request->sample_type,
             'date_started' => $request->date_started,
             'date_finished' => $request->date_finished,
-
             'test_method' => $request->test_method,
             'objective_used' => json_encode($request->objective_used ?? []),
-
             'length_cm' => $request->length_cm,
             'result' => $request->result,
             'remarks' => $request->remarks,
-
             'analyzed_by' => $request->analyzed_by,
             'checked_by' => $request->checked_by,
-
             'updated_at' => now(),
         ];
 

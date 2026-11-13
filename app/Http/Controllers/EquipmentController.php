@@ -951,8 +951,8 @@ class EquipmentController extends Controller
     private function equipmentTableColumns(): array
     {
         return [
-            ['key' => 'equipment', 'label' => 'Equipment', 'default_visible' => true, 'type' => 'text'],
-            ['key' => 'equipment_no', 'label' => 'Equipment No.', 'default_visible' => true, 'type' => 'text'],
+            ['key' => 'equipment', 'label' => 'Item', 'default_visible' => true, 'type' => 'text'],
+            ['key' => 'equipment_no', 'label' => 'Item No.', 'default_visible' => true, 'type' => 'text'],
             ['key' => 'qty', 'label' => 'QTY', 'default_visible' => true, 'type' => 'number'],
             ['key' => 'unit', 'label' => 'Unit', 'default_visible' => true, 'type' => 'text'],
             ['key' => 'rfl_control_no', 'label' => 'RFL Control No.', 'default_visible' => false, 'type' => 'text'],

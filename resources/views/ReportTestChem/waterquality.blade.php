@@ -460,13 +460,15 @@
                 <td>{{ $sampleCode }}</td>
                 <td>{{ $sampleType }}</td>
 
-                @if ($resultColumnCount > 0)
-                    @foreach ($analysisRequested as $requested)
-                        <td>{{ $getWaterQualityResult($labCode, $requested) }}</td>
-                    @endforeach
-                @else
-                    <td></td>
-                @endif
+                  @if ($resultColumnCount > 0)
+                        @foreach ($analysisRequested as $requested)
+                            <td class="bold">
+                                {{ $analysisResultsByLabCode[$labCode][$requested] ?? '' }}
+                            </td>
+                        @endforeach
+                    @else
+                <td></td>
+            @endif
             </tr>
         @endforeach
     </tbody>

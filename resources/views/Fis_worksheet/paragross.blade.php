@@ -499,8 +499,9 @@
         <td>
             <select name="analyzed_by" class="signature-select">
                 <option value="">Select Analyst</option>
-
-                @foreach($users as $user)
+                 <option value="MGEG">MGEG</option>
+                 <option value="MMM">MMM</option>
+                {{-- @foreach($users as $user)
                     @php
                         $fullName = trim(
                             ($user->f_name ?? '') . ' ' .
@@ -513,15 +514,16 @@
                         {{ old('analyzed_by', $worksheet->analyzed_by ?? '') == $fullName ? 'selected' : '' }}>
                         {{ $fullName }}
                     </option>
-                @endforeach
+                @endforeach --}}
             </select>
         </td>
 
         <td>
             <select name="checked_by" class="signature-select">
                 <option value="">Select Checker</option>
-
-                @foreach($users as $user)
+                 <option value="MGEG">MGEG</option>
+                 <option value="MMM">MMM</option>
+                {{-- @foreach($users as $user)
                     @php
                         $fullName = trim(
                             ($user->f_name ?? '') . ' ' .
@@ -534,7 +536,7 @@
                         {{ old('checked_by', $worksheet->checked_by ?? '') == $fullName ? 'selected' : '' }}>
                         {{ $fullName }}
                     </option>
-                @endforeach
+                @endforeach --}}
             </select>
         </td>
     </tr>

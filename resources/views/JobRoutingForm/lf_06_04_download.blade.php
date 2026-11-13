@@ -140,14 +140,22 @@ use Carbon\Carbon;
             <td class="center">Time</td>
         </tr>
 
-        <tr class="h18">
+       <tr class="h18">
             <td>Sample Reception</td>
-            <td>{{ $routingForm->receiving_in_date ? Carbon::parse($routingForm->receiving_in_date)->format('F d, Y') : '' }}</td>
-            <td>{{ $routingForm->receiving_in_time ?? '' }}</td>
-            <td>{{ $routingForm->receiving_out_date ? Carbon::parse($routingForm->receiving_out_date)->format('F d, Y') : '' }}</td>
-            <td>{{ $routingForm->receiving_out_time ?? '' }}</td>
-            <td>{{ $routingForm->receiving_remarks ?? '' }}</td>
-            <td colspan="2">{{ $routingForm->receiving_initials ?? '' }}</td>
+            <td>
+                {{ $routingForm?->receiving_in_date 
+                    ? Carbon::parse($routingForm->receiving_in_date)->format('F d, Y') 
+                    : '' }}
+            </td>
+            <td>{{ $routingForm?->receiving_in_time ?? '' }}</td>
+            <td>
+                {{ $routingForm?->receiving_out_date 
+                    ? Carbon::parse($routingForm->receiving_out_date)->format('F d, Y') 
+                    : '' }}
+            </td>
+            <td>{{ $routingForm?->receiving_out_time ?? '' }}</td>
+            <td>{{ $routingForm?->receiving_remarks ?? '' }}</td>
+            <td colspan="2">{{ $routingForm?->receiving_initials ?? '' }}</td>
         </tr>
 
         <tr class="h16">
@@ -186,17 +194,24 @@ use Carbon\Carbon;
             <td class="center">Time</td>
         </tr>
 
-        <tr class="h16">
-            <td>I. Sample preparation</td>
-            <td>{{ $routingForm->prep_in_date ? Carbon::parse($routingForm->prep_in_date)->format('F d, Y') : '' }}</td>
-            <td>{{ $routingForm->prep_in_time ?? '' }}</td>
-            <td>{{ $routingForm->prep_out_date ? Carbon::parse($routingForm->prep_out_date)->format('F d, Y') : '' }}</td>
-            <td>{{ $routingForm->prep_out_time ?? '' }}</td>
-            <td>{{ $routingForm->prep_results ?? '' }}</td>
-            <td>{{ $routingForm->prep_recovery ?? '' }}</td>
-            <td>{{ $routingForm->prep_initials ?? '' }}</td>
-        </tr>
-
+      <tr class="h16">
+    <td>I. Sample preparation</td>
+    <td>
+        {{ $routingForm?->prep_in_date 
+            ? Carbon::parse($routingForm->prep_in_date)->format('F d, Y') 
+            : '' }}
+    </td>
+    <td>{{ $routingForm?->prep_in_time ?? '' }}</td>
+    <td>
+        {{ $routingForm?->prep_out_date 
+            ? Carbon::parse($routingForm->prep_out_date)->format('F d, Y') 
+            : '' }}
+    </td>
+    <td>{{ $routingForm?->prep_out_time ?? '' }}</td>
+    <td>{{ $routingForm?->prep_results ?? '' }}</td>
+    <td>{{ $routingForm?->prep_recovery ?? '' }}</td>
+    <td>{{ $routingForm?->prep_initials ?? '' }}</td>
+</tr>
       <tr class="h16">
         <td>II. Analysis</td>
         <td>{{ $routingForm->analysis_1 ?? '' }}</td>
@@ -272,42 +287,54 @@ use Carbon\Carbon;
             </td>
         </tr>
 
-        <tr class="h18">
-            <td colspan="4">
-                <span class="bold">Checked By:</span>
-                <span class="line">{{ $routingForm->checked_by ?? '' }}</span>
-            </td>
-            <td colspan="4">
-                <span class="bold">Date:</span>
-                <span class="line">
-                    {{ $routingForm->checked_date ? Carbon::parse($routingForm->checked_date)->format('F d, Y') : '' }}
-                </span>
-            </td>
-        </tr>
+       <tr class="h18">
+    <td colspan="4">
+        <span class="bold">Checked By:</span>
+        <span class="line">{{ $routingForm?->checked_by ?? '' }}</span>
+    </td>
+    <td colspan="4">
+        <span class="bold">Date:</span>
+        <span class="line">
+            {{ $routingForm?->checked_date 
+                ? Carbon::parse($routingForm->checked_date)->format('F d, Y') 
+                : '' }}
+        </span>
+    </td>
+</tr>
 
-        {{-- REPORT --}}
-        <tr>
-            <td colspan="8" class="title">
-                PREPARATION OF REPORT OF TEST
-            </td>
-        </tr>
+{{-- REPORT --}}
+<tr>
+    <td colspan="8" class="title">
+        PREPARATION OF REPORT OF TEST
+    </td>
+</tr>
 
-        <tr class="h16">
-            <td>Preparation of Test Report</td>
-            <td>{{ $routingForm->report_in_date ? Carbon::parse($routingForm->report_in_date)->format('F d, Y') : '' }}</td>
-            <td>{{ $routingForm->report_in_time ?? '' }}</td>
-            <td>{{ $routingForm->report_out_date ? Carbon::parse($routingForm->report_out_date)->format('F d, Y') : '' }}</td>
-            <td>{{ $routingForm->report_out_time ?? '' }}</td>
-            <td>{{ $routingForm->report_remarks ?? '' }}</td>
-            <td colspan="2">{{ $routingForm->report_initials ?? '' }}</td>
-        </tr>
+<tr class="h16">
+    <td>Preparation of Test Report</td>
+    <td>
+        {{ $routingForm?->report_in_date 
+            ? Carbon::parse($routingForm->report_in_date)->format('F d, Y') 
+            : '' }}
+    </td>
+    <td>{{ $routingForm?->report_in_time ?? '' }}</td>
+    <td>
+        {{ $routingForm?->report_out_date 
+            ? Carbon::parse($routingForm->report_out_date)->format('F d, Y') 
+            : '' }}
+    </td>
+    <td>{{ $routingForm?->report_out_time ?? '' }}</td>
+    <td>{{ $routingForm?->report_remarks ?? '' }}</td>
+    <td colspan="2">{{ $routingForm?->report_initials ?? '' }}</td>
+</tr>
 
-        <tr class="h16">
-            <td>Date Approved for Release</td>
-            <td colspan="7">
-                {{ $routingForm->date_approved_release ? Carbon::parse($routingForm->date_approved_release)->format('F d, Y') : '' }}
-            </td>
-        </tr>
+<tr class="h16">
+    <td>Date Approved for Release</td>
+    <td colspan="7">
+        {{ $routingForm?->date_approved_release 
+            ? Carbon::parse($routingForm->date_approved_release)->format('F d, Y') 
+            : '' }}
+    </td>
+</tr>
 
     </table>
 </div>

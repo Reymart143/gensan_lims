@@ -1,180 +1,103 @@
 <!doctype html>
-<html lang="en" dir="ltr">
-  <head>
+<html lang="en">
+<head>
     <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <title>LIMS LOGIN</title>
-      
-      <!-- Favicon -->
-       <link rel="shortcut icon" href="/assets/images/bfarlogo.png">
-      <link rel="stylesheet" href="/assets/css/core/libs.min.css">
-      <link rel="stylesheet" href="/assets/css/hope-ui.min.css?v=4.0.0">
-      <link rel="stylesheet" href="/assets/css/custom.min.css?v=4.0.0">
-      <link rel="stylesheet" href="/assets/css/customizer.min.css">
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="BFAR Regional Fisheries Laboratory XII staff portal">
+    <title>Staff Portal | BFAR RFL XII</title>
+    <link rel="shortcut icon" href="{{ asset('assets/images/bfarlogo.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root { --deep: #003b67; --ocean: #0065a8; --aqua: #00a7b5; --ink: #17324a; --gold: #f5c343; }
+        * { box-sizing: border-box; }
+        body { min-height: 100vh; margin: 0; color: var(--ink); font-family: "Segoe UI", Arial, sans-serif; background: #eff7fa; }
+        .login-page { min-height: 100vh; display: grid; grid-template-columns: minmax(0, .94fr) minmax(440px, 1.06fr); }
+        .welcome-panel { position: relative; display: flex; align-items: center; overflow: hidden; padding: 3rem clamp(2.5rem, 6vw, 7rem); color: #fff; background: linear-gradient(140deg, rgba(0,42,72,.94), rgba(0,96,147,.75)), url('{{ asset('assets/images/BG_LOGIN.jpg') }}') center/cover; }
+        .welcome-panel::before, .welcome-panel::after { content: ""; position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,.18); }
+        .welcome-panel::before { width: 510px; height: 510px; bottom: -300px; left: -160px; box-shadow: 0 0 0 48px rgba(255,255,255,.045), 0 0 0 96px rgba(255,255,255,.035); }
+        .welcome-panel::after { width: 290px; height: 290px; top: -150px; right: -100px; }
+        .welcome-content { position: relative; z-index: 1; max-width: 570px; }
+        .seal { width: 93px; height: 93px; object-fit: contain; padding: 5px; border-radius: 50%; background: rgba(255,255,255,.92); }
+        .agency { margin: 1.35rem 0 .9rem; font-size: .73rem; font-weight: 800; letter-spacing: .16em; color: #8eecef; }
+        .welcome-panel h1 { margin: 0; font-size: clamp(2.5rem, 4.1vw, 4.25rem); font-weight: 800; letter-spacing: -.045em; line-height: 1.08; }
+        .welcome-panel h1 span { color: #78e3e8; }
+        .welcome-panel p { max-width: 500px; margin: 1.4rem 0 0; color: #dcecf4; font-size: 1.05rem; line-height: 1.75; }
+        .welcome-points { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; margin-top: 2rem; font-size: .9rem; font-weight: 600; }
+        .welcome-points i { color: var(--gold); margin-right: .35rem; }
+        .form-panel { display: flex; align-items: center; justify-content: center; padding: 2rem; background: #fff; }
+        .form-wrap { width: min(100%, 430px); padding: 2.25rem; border: 1px solid #d5e3ea; border-radius: 1rem; background: #fff; box-shadow: 0 18px 44px rgba(11, 61, 92, .12); }
+        .back-link { color: #527084; font-size: .9rem; font-weight: 600; text-decoration: none; }
+        .back-link:hover { color: var(--ocean); }
+        .form-brand { display: flex; align-items: center; gap: .75rem; margin: 2.2rem 0 2.7rem; }
+        .form-brand img { width: 47px; height: 47px; object-fit: contain; mix-blend-mode: multiply; }
+        .form-brand strong { color: var(--deep); font-size: .82rem; line-height: 1.35; }
+        .form-brand small { color: #698090; font-size: .66rem; font-weight: 600; }
+        .form-title { color: var(--deep); font-size: 2rem; font-weight: 800; letter-spacing: -.035em; }
+        .form-subtitle { color: #637b8b; margin-bottom: 2rem; }
+        .form-label { margin-bottom: .45rem; color: #345066; font-size: .89rem; font-weight: 700; }
+        .input-group-text { padding: 0 .9rem; color: #6d8290; border-color: #d7e3e9; border-right: 0; background: #f8fbfc; }
+        .form-control { min-height: 51px; border-color: #d7e3e9; border-left: 0; background: #f8fbfc; box-shadow: none!important; }
+        .form-control:focus { border-color: var(--aqua); background: #fff; }
+        .input-group:focus-within .input-group-text { border-color: var(--aqua); background: #fff; color: var(--ocean); }
+        .password-toggle { border: 1px solid #d7e3e9; border-left: 0; color: #6d8290; background: #f8fbfc; }
+        .password-toggle:hover { color: var(--ocean); background: #fff; }
+        .btn-signin { min-height: 52px; border: 0; border-radius: .65rem; background: var(--ocean); font-weight: 800; letter-spacing: .01em; box-shadow: 0 8px 17px rgba(0,101,168,.2); }
+        .btn-signin:hover { background: var(--deep); }
+        .security-note { margin-top: 1.7rem; color: #718795; font-size: .79rem; text-align: center; }
+        .security-note i { color: var(--aqua); }
+        .alert-floating { position: fixed; top: 1rem; right: 1rem; z-index: 1055; min-width: min(390px, calc(100vw - 2rem)); border: 0; border-radius: .75rem; box-shadow: 0 10px 28px rgba(9,47,72,.18); }
+        @media (max-width: 900px) { .login-page { grid-template-columns: 1fr; } .welcome-panel { display: none; } .form-panel { min-height: 100vh; } }
+        @media (max-width: 460px) { .form-panel { padding: 1rem; } .form-wrap { padding: 1.5rem; } .form-brand { margin: 1.2rem 0 2.2rem; } .form-title { font-size: 1.8rem; } }
+    </style>
+</head>
+<body>
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show alert-floating auto-dismiss" role="alert"><i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show alert-floating auto-dismiss" role="alert"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+    @endif
 
-  </head>
-     @if(session('success'))
-      <div class="mb-3 alert alert-left alert-success alert-dismissible fade show auto-dismiss"
-         role="alert"
-         style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
-         <i class="bi bi-check-circle-fill me-2" style="font-size: 20px;"></i>
-         <span>{{ session('success') }}</span>
-
-         <button type="button" class="btn-close btn-close-white"
-                  data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-      @endif
-
-
-      @if(session('error'))
-      <div class="mb-3 alert alert-bottom alert-danger alert-dismissible fade show auto-dismiss"
-         role="alert"
-         style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
-          <i class="bi bi-exclamation-triangle-fill me-2" style="font-size: 20px;"></i>
-         <span>{{ session('error') }}</span>
-
-         <button type="button" class="btn-close btn-close-white"
-                  data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-      @endif
-      <script>
-      setTimeout(function () {
-         document.querySelectorAll('.auto-dismiss').forEach(function(alert) {
-            alert.classList.remove('show'); 
-            setTimeout(() => alert.remove(), 500);
-         });
-      }, 4000);
-      </script>
-  <body class=" " data-bs-spy="scroll" data-bs-target="#elements-section" data-bs-offset="0" tabindex="0">
-   
-
-    <!-- loader Start -->
-    <div id="loading">
-      <div class="loader simple-loader">
-          <div class="loader-body">
-          </div>
-      </div>    
-   </div>
-      <div class="wrapper">
-      <section class="login-content">
-         <div class="row m-0 align-items-center bg-white vh-100">            
-            <div class="col-md-6">
-               <div class="row justify-content-center">
-                  <div class="col-md-10">
-                     <div class="card card-transparent shadow-none d-flex justify-content-center mb-0 auth-card">
-                        <div class="card-body" style="margin-top:-30%">
-                           <a href="https://r12.bfar.da.gov.ph/" target="_blank" class="navbar-brand d-flex align-items-center mb-3">
-                              
-                              <!--Logo start-->
-                             
-                              <!--logo End-->
-                              
-                              
-                         
-                           <div class="ms-2 text-center w-80">
-                                <img src="../assets/images/bfarlogo.png" 
-                            alt="BFAR Logo" 
-                            class="img-fluid" style="width: 30%">
-                              
-                                 <h6 class="mb-0">Republic of the Philippines</h6>
-                                 <h6 class="mb-0">Department of Agriculture</h6>
-                                 <h6 class="mb-0">BUREAU OF FISHERIES AND AQUATIC RESOURCES</h6>
-                                 <h5 class="fw-bold mb-0">REGIONAL FISHERIES LABORATORY XII</h5>
-                                 <h6 class="mb-0">J. Catolico St., Lagao, General Santos City</h6>
-                           </div>
-                           </a>
-                           <div class="border-box p-4" style="border: 2px solid #6f768d86; border-radius: 12px; background-color: #fafafa;">
-
-                           
-                           <h3 class="mb-3 mt-3 text-center text-primary">LOGIN PORTAL</h3>
-                           
-                              <form action="{{ route('login-user')}}" method="POST">
-                                 @csrf
-                                 <div class="row">
-                                    <div class="col-lg-12">
-                                       <div class="form-group">
-                                          <label for="text" class="form-label">Username</label>
-                                          <input type="text" class="form-control" id="username" name="username" aria-describedby="username" placeholder="Enter Username" required>
-                                       </div>
-                                    </div>
-                                    <div class="col-lg-12">
-                                       <div class="form-group">
-                                          <label for="password" class="form-label">Password</label>
-                                          <input type="password" class="form-control" id="password" name="password" aria-describedby="password" placeholder="Enter Password" required>
-                                       </div>
-                                    </div>
-                                    <div class="col-lg-12 d-flex justify-content-between">
-                                       {{-- <div class="form-check mb-3">
-                                          <input type="checkbox" class="form-check-input" id="customCheck1">
-                                          <label class="form-check-label" for="customCheck1">Remember Me</label>
-                                       </div> --}}
-                                       {{-- <a href="recoverpw.html">Forgot Password?</a> --}}
-                                    </div>
-                                 </div>
-                                 <div class="d-flex justify-content-center">
-                                    <button type="submit" class="btn btn-primary">Sign In</button>
-                                 </div>
-                              </div>
-                              {{-- <p class="text-center my-3">or sign in with other accounts?</p>
-                              <div class="d-flex justify-content-center">
-                                 <ul class="list-group list-group-horizontal list-group-flush">
-                                    <li class="list-group-item border-0 pb-0">
-                                       <a href="#"><img src="../../assets/images/brands/fb.svg" alt="fb"></a>
-                                    </li>
-                                    <li class="list-group-item border-0 pb-0">
-                                       <a href="#"><img src="../../assets/images/brands/gm.svg" alt="gm"></a>
-                                    </li>
-                                    <li class="list-group-item border-0 pb-0">
-                                       <a href="#"><img src="../../assets/images/brands/im.svg" alt="im"></a>
-                                    </li>
-                                    <li class="list-group-item border-0 pb-0">
-                                       <a href="#"><img src="../../assets/images/brands/li.svg" alt="li"></a>
-                                    </li>
-                                 </ul>
-                              </div>
-                              <p class="mt-3 text-center">
-                                 Don’t have an account? <a href="sign-up.html" class="text-underline">Click here to sign up.</a>
-                              </p> --}}
-                           </form>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-               <div class="sign-bg">
-                  {{-- <svg width="280" height="230" viewBox="0 0 431 398" fill="none" xmlns="http://www.w3.org/2000/svg">
-                     <g opacity="0.05">
-                     <rect x="-157.085" y="193.773" width="543" height="77.5714" rx="38.7857" transform="rotate(-45 -157.085 193.773)" fill="#3B8AFF"/>
-                     <rect x="7.46875" y="358.327" width="543" height="77.5714" rx="38.7857" transform="rotate(-45 7.46875 358.327)" fill="#3B8AFF"/>
-                     <rect x="61.9355" y="138.545" width="310.286" height="77.5714" rx="38.7857" transform="rotate(45 61.9355 138.545)" fill="#3B8AFF"/>
-                     <rect x="62.3154" y="-190.173" width="543" height="77.5714" rx="38.7857" transform="rotate(45 62.3154 -190.173)" fill="#3B8AFF"/>
-                     </g>
-                  </svg> --}}
-
-               </div>
+    <main class="login-page">
+        <section class="welcome-panel" aria-label="BFAR Regional Fisheries Laboratory XII">
+            <div class="welcome-content">
+                <img class="seal" src="{{ asset('assets/images/bfarlogo.png') }}" alt="BFAR Region XII seal">
+                <div class="agency">BUREAU OF FISHERIES AND AQUATIC RESOURCES</div>
+                <h1>Laboratory data with a <span>purpose.</span></h1>
+                <p>Welcome to the Regional Fisheries Laboratory XII Laboratory Information Management System — supporting safe fisheries, trusted results, and better public service.</p>
+                <div class="welcome-points"><span><i class="bi bi-check-circle-fill"></i> Secure access</span><span><i class="bi bi-check-circle-fill"></i> Quality-focused workflow</span></div>
             </div>
-            <div class="col-md-6 d-md-block d-none bg-primary p-0 mt-n1 vh-100 overflow-hidden">
-               <img src="../../assets/images/bg.jpg" class="img-fluid gradient-main animated-scaleX" alt="images">
-            </div>
-            {{-- <div class="col-md-6 d-md-block d-none bg-primary p-0 mt-n1 vh-100 position-relative overflow-hidden">
-               <img src="../../assets/images/bg.jpg" class="img-fluid w-100 h-100 object-fit-cover" alt="images">
-               <div class="overlay position-absolute top-0 start-0 w-100 h-100"></div>
-            </div>
+        </section>
 
-            <style>
-            .overlay {
-               background-color: rgba(138, 143, 148, 0.267); /* Blue with 40% opacity */
-            }
-        
-            </style> --}}
-            
-         </div>
-      </section>
-      </div>
-    <script src="/assets/js/core/libs.min.js"></script>
-    <script src="/assets/js/plugins/fslightbox.js"></script>
-    <script src="/assets/js/hope-ui.js" defer></script>
-    
-    
-  </body>
+        <section class="form-panel">
+            <div class="form-wrap">
+                <a href="{{ url('/') }}" class="back-link"><i class="bi bi-arrow-left me-1"></i> Back to homepage</a>
+                <div class="form-brand"><img src="{{ asset('assets/images/bfarlogo.png') }}" alt="BFAR Region XII seal"><div><strong>BFAR REGIONAL FISHERIES<br>LABORATORY XII</strong><br><small>GENERAL SANTOS CITY</small></div></div>
+                <h1 class="form-title">Welcome back</h1>
+                <p class="form-subtitle">Sign in with your staff account to continue.</p>
+
+                <form action="{{ route('login-user') }}" method="POST">
+                    @csrf
+                    <div class="mb-3"><label class="form-label" for="username">Username</label><div class="input-group"><span class="input-group-text"><i class="bi bi-person"></i></span><input class="form-control" id="username" name="username" type="text" value="{{ old('username') }}" autocomplete="username" placeholder="Enter your username" required autofocus></div></div>
+                    <div class="mb-4"><label class="form-label" for="password">Password</label><div class="input-group"><span class="input-group-text"><i class="bi bi-key"></i></span><input class="form-control" id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required><button class="password-toggle" type="button" id="passwordToggle" aria-label="Show password"><i class="bi bi-eye"></i></button></div></div>
+                    <button class="btn btn-primary btn-signin w-100" type="submit">Sign in <i class="bi bi-arrow-right ms-1"></i></button>
+                </form>
+                <p class="security-note"><i class="bi bi-shield-lock-fill me-1"></i> Authorized BFAR personnel only</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('passwordToggle').addEventListener('click', function () {
+            const password = document.getElementById('password');
+            const visible = password.type === 'text';
+            password.type = visible ? 'password' : 'text';
+            this.setAttribute('aria-label', visible ? 'Show password' : 'Hide password');
+            this.innerHTML = '<i class="bi bi-eye' + (visible ? '' : '-slash') + '"></i>';
+        });
+        setTimeout(() => document.querySelectorAll('.auto-dismiss').forEach(alert => bootstrap.Alert.getOrCreateInstance(alert).close()), 4500);
+    </script>
+</body>
 </html>

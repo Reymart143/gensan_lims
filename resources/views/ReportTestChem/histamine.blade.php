@@ -32,12 +32,10 @@
             left: 35px;
             top: 0;
             width: 85px;
-        }
-
+        }   
         .bold {
             font-weight: bold;
         }
-
         .report-title {
             text-align: center;
             font-weight: bold;
@@ -207,6 +205,7 @@
 
         <td>
             Date of Test:
+            {{ now()->format('F d, Y') }}
         </td>
     </tr>
 
@@ -240,12 +239,19 @@
 
     <tbody>
         @foreach ($samples as $i => $sample)
+            @php
+                $labCode = $sample['lab_code'] ?? '';
+            @endphp
+
             <tr>
                 <td>{{ $i + 1 }}</td>
-                <td>{{ $sample['lab_code'] ?? '' }}</td>
+                <td>{{ $labCode }}</td>
                 <td>{{ $sample['sample_code'] ?? '' }}</td>
                 <td>{{ $sample['sample_type'] ?? '' }}</td>
-                <td></td>
+
+                <td class="bold">
+                    {{ collect($analysisResultsByLabCode[$labCode] ?? [])->first() ?? '' }}
+                </td>
             </tr>
         @endforeach
     </tbody>

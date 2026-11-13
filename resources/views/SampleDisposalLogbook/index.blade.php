@@ -54,6 +54,7 @@
                                 <button type="submit" class="btn btn-outline-danger mr-2 ml-2" style="margin-lefT:2mm">Search</button>
                                 <a href="{{ route('clients') }}" class="btn btn-outline-secondary" style="margin-lefT:2mm">Clear</a>
                             </form> --}}
+                            <input type="search" class="form-control mb-3" style="max-width: 520px" data-table-search="#user-list-table" data-search-columns="0,1" placeholder="Search laboratory code or sample description">
                             <div class="table-responsive mt-3">
                                 
                                 <table id="user-list-table" class="table table-striped" role="grid" data-bs-toggle="data-table">

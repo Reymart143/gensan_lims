@@ -299,16 +299,71 @@
                                 });
                             }
                         </script>
-                        <div class="col-md-6 position-relative mt-4 mb-2">
+                         <div class="col-md-6 position-relative mt-4 mb-2">
                             <label for="contact_no" class="form-label">Contact No.</label>
-                            <input type="text" class="form-control" id="contact_no" required name="contact_no">
+                            <input type="text" class="form-control" id="contact_no" name="contact_no" required maxlength="11">
                             <div class="invalid-tooltip">
-                                Please provide a contact number
+                                Please provide a valid contact number.
                             </div>
                             <div class="valid-tooltip">
                                 Looks good!
                             </div>
                         </div>
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+                        <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const contactInput = document.getElementById("contact_no");
+
+    if (!contactInput) return;
+
+    // Find the parent form
+    const form = contactInput.closest("form");
+
+    // Numbers only
+    contactInput.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, '');
+    });
+
+    form.addEventListener("submit", function (e) {
+
+        let contact = contactInput.value.trim();
+
+        if (contact === "") {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Contact Number Required',
+                text: 'Please enter your contact number.'
+            });
+            return;
+        }
+
+        if (!/^\d+$/.test(contact)) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Contact Number',
+                text: 'Numbers only.'
+            });
+            return;
+        }
+
+        if (!/^09\d{9}$/.test(contact)) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Contact Number',
+                text: 'Must start with 09 and be exactly 11 digits.'
+            });
+            return;
+        }
+
+    });
+
+});
+                        </script>
                         <div class="col-md-6 position-relative mt-4">
                             <label for="date" class="form-label">Date</label>
                             <input type="date" class="form-control" id="date" name="date">

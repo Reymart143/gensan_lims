@@ -147,7 +147,7 @@
         .calculations-box {
             margin-top: 20px;
             border: 1px solid #000;
-            height: 245px;
+            height: 350px;
         }
 
         .calculations-title {
@@ -212,7 +212,9 @@
 </head>
 
 <body>
+
 @php
+use Carbon\Carbon;
     function wbDownloadJson($value) {
         if (empty($value)) {
             return [];
@@ -263,11 +265,13 @@
 
     $labCodes = wbDownloadJson($rla->laboratory_code ?? null);
     $firstLabCode = $labCodes[0] ?? '';
-
+    $selectedLabCode = $selectedLabCode ?? request('laboratory_code');
     $sampleDescriptions = wbDownloadJson($rla->sample_description ?? null);
     $firstSampleDescription = $sampleDescriptions[0] ?? '';
 
-    $analysisRequested = wbDownloadFlatten(wbDownloadJson($rla->analysis_requested ?? null));
+   $analysisRequested = wbDownloadFlatten(
+    wbDownloadJson($worksheet->analysis_requested ?? null)
+);
 
     $testName = wbDownloadJson($worksheet->test_name ?? null);
 
@@ -302,8 +306,13 @@
     $labCode = $worksheet->lab_code ?? $firstLabCode;
     $sampleType = $worksheet->sample_type ?? $firstSampleDescription;
 
-    $dateStarted = wbDownloadDate($worksheet->date_started ?? '');
-    $dateFinished = wbDownloadDate($worksheet->date_finished ?? '');
+    $dateStarted = !empty($worksheet->date_started)
+        ? Carbon::parse($worksheet->date_started)->format('F d, Y h:i A')
+        : '';
+
+    $dateFinished = !empty($worksheet->date_finished)
+        ? Carbon::parse($worksheet->date_finished)->format('F d, Y h:i A')
+        : '';
 @endphp
 
 {{-- HEADER --}}
@@ -384,7 +393,7 @@
 
         <td colspan="2" class="info-cell">
             <b>Lab Code:</b>
-            <span style="margin-left:30px;">{{ $labCode }}</span>
+            <span style="margin-left:30px;">{{ $selectedLabCode }}</span>
         </td>
 
         <td colspan="3" class="info-cell">
@@ -473,10 +482,38 @@
 {{-- CALCULATIONS --}}
 <div class="calculations-box">
     <div class="calculations-title">CALCULATIONS</div>
+
     <div class="calculations-content">
-        {{ $worksheet->calculations ?? '' }}
+        {!! nl2br(e($worksheet->calculations ?? '')) !!}
     </div>
 </div>
+
+<style>
+
+
+.calculations-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+
+.calculations-content {
+    font-size: 9px;
+    line-height: 1.4;
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+
+    white-space: normal;
+}
+
+/* kada calculation block */
+.calculations-content > div {
+    break-inside: avoid;
+}
+</style>
 
 {{-- SIGNATURE --}}
 <table class="signature-table">

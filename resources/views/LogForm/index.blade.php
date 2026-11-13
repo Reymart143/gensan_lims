@@ -131,7 +131,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                             <td>LF 01-03</td>
+                                            <td>LF 01-03</td>
                                             <td>AUTHORIZATION OF SCOPE OF WORK (Fish Health Analyst 2) </td>
                                             <td>Laboratory Form</td>
                                             <td>0</td>

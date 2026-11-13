@@ -80,27 +80,86 @@
                                             </script>
 
                               </div>
-                            <div class="d-flex flex-column align-items-center justify-content-center">
-                                    <img src="{{ $user->image ? asset( $user->image) : asset('../../assets/images/avatars/01.png') }}" 
-                                        alt="User-Profile" class="theme-color-default-img img-fluid rounded-pill avatar-100 profileImages">
+                         <div class="d-flex flex-column align-items-center justify-content-center">
 
-                                    <img src="{{ $user->image ? asset($user->image) : asset('../../assets/images/avatars/avtar_1.png') }}" 
-                                        alt="User-Profile" class="theme-color-purple-img img-fluid rounded-pill avatar-100 profileImages">
+                            <img src="{{ $user->image ? asset($user->image) : asset('../../assets/images/avatars/01.png') }}"
+                                class="theme-color-default-img img-fluid rounded-pill avatar-100 profileImages preview-image"
+                                data-bs-toggle="modal"
+                                data-bs-target="#imagePreviewModal"
+                                style="cursor:pointer;">
 
-                                    <img src="{{ $user->image ? asset($user->image) : asset('../../assets/images/avatars/avtar_2.png') }}" 
-                                        alt="User-Profile" class="theme-color-blue-img img-fluid rounded-pill avatar-100 profileImages">
+                            <img src="{{ $user->image ? asset($user->image) : asset('../../assets/images/avatars/avtar_1.png') }}"
+                                class="theme-color-purple-img img-fluid rounded-pill avatar-100 profileImages preview-image"
+                                data-bs-toggle="modal"
+                                data-bs-target="#imagePreviewModal"
+                                style="cursor:pointer;">
 
-                                    <img src="{{ $user->image ? asset($user->image) : asset('../../assets/images/avatars/avtar_4.png') }}" 
-                                        alt="User-Profile" class="theme-color-green-img img-fluid rounded-pill avatar-100 profileImages">
+                            <img src="{{ $user->image ? asset($user->image) : asset('../../assets/images/avatars/avtar_2.png') }}"
+                                class="theme-color-blue-img img-fluid rounded-pill avatar-100 profileImages preview-image"
+                                data-bs-toggle="modal"
+                                data-bs-target="#imagePreviewModal"
+                                style="cursor:pointer;">
 
-                                    <img src="{{ $user->image ? asset($user->image) : asset('../../assets/images/avatars/avtar_5.png') }}" 
-                                        alt="User-Profile" class="theme-color-yellow-img img-fluid rounded-pill avatar-100 profileImages">
+                            <img src="{{ $user->image ? asset($user->image) : asset('../../assets/images/avatars/avtar_4.png') }}"
+                                class="theme-color-green-img img-fluid rounded-pill avatar-100 profileImages preview-image"
+                                data-bs-toggle="modal"
+                                data-bs-target="#imagePreviewModal"
+                                style="cursor:pointer;">
 
-                                    <img src="{{ $user->image ? asset($user->image) : asset('../../assets/images/avatars/avtar_3.png') }}" 
-                                        alt="User-Profile" class="theme-color-pink-img img-fluid rounded-pill avatar-100 profileImages">
+                            <img src="{{ $user->image ? asset($user->image) : asset('../../assets/images/avatars/avtar_5.png') }}"
+                                class="theme-color-yellow-img img-fluid rounded-pill avatar-100 profileImages preview-image"
+                                data-bs-toggle="modal"
+                                data-bs-target="#imagePreviewModal"
+                                style="cursor:pointer;">
+
+                            <img src="{{ $user->image ? asset($user->image) : asset('../../assets/images/avatars/avtar_3.png') }}"
+                                class="theme-color-pink-img img-fluid rounded-pill avatar-100 profileImages preview-image"
+                                data-bs-toggle="modal"
+                                data-bs-target="#imagePreviewModal"
+                                style="cursor:pointer;">
+
+                        </div>
+                         <div class="modal fade" id="imagePreviewModal" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content border-0 bg-transparent shadow-none">
+
+                                    <button type="button"
+                                            class="btn-close bg-white position-absolute top-0 end-0 m-3"
+                                            data-bs-dismiss="modal"></button>
+
+                                    <img id="previewImage"
+                                        src=""
+                                        class="img-fluid rounded shadow"
+                                        style="max-height:80vh; object-fit:contain;">
+                                </div>
                             </div>
+                        </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
 
+                                document.querySelectorAll('.preview-image').forEach(function(img){
 
+                                    img.addEventListener('click', function(){
+
+                                        document.getElementById('previewImage').src = this.src;
+
+                                    });
+
+                                });
+
+                            });
+                            </script>
+                            <style>
+                                .preview-image{
+                                    cursor:pointer;
+                                    transition:.3s;
+                                }
+
+                                .preview-image:hover{
+                                    transform:scale(1.08);
+                                    box-shadow:0 10px 25px rgba(0,0,0,.25);
+                                }
+                            </style>
                            <div class="border bg-danger-subtle rounded p-3">
                                 <div class="text-center">
                                     <span class="text-success">

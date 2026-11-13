@@ -295,23 +295,86 @@
     </thead>
 
     <tbody>
-        @foreach ($samples as $sample)
+        {{-- @foreach ($samples as $sample)
             <tr>
                 <td class="bold">{{ $sample['lab_code'] ?? '' }}</td>
                 <td>{{ $sample['sample_code'] ?? '' }}</td>
                 <td>{{ $sample['sample_type'] ?? '' }}</td>
 
-                @if ($resultColumnCount > 0)
+                 @if ($resultColumnCount > 0)
                     @foreach ($analysisRequested as $requested)
-                        <td>
-                            {{ $getResultValue($sample['lab_code'] ?? '', $requested) }}
+                        <td class="bold">
+                            {{ $analysisResultsByLabCode[$labCode][$requested] ?? '' }}
                         </td>
                     @endforeach
                 @else
                     <td></td>
                 @endif
             </tr>
-        @endforeach
+        @endforeach --}}
+        <tbody>
+
+    @foreach ($samples as $sample)
+
+        @php
+            $labCode = strtoupper(
+                trim(
+                    (string) (
+                        $sample['lab_code'] ?? ''
+                    )
+                )
+            );
+        @endphp
+
+        <tr>
+
+            <td class="bold">
+                {{ $sample['lab_code'] ?? '' }}
+            </td>
+
+            <td>
+                {{ $sample['sample_code'] ?? '' }}
+            </td>
+
+            <td>
+                {{ $sample['sample_type'] ?? '' }}
+            </td>
+
+            @if ($resultColumnCount > 0)
+
+                @foreach ($analysisRequested as $requested)
+
+                    @php
+                        $requestedKey = strtoupper(
+                            trim(
+                                (string) $requested
+                            )
+                        );
+                    @endphp
+
+                    <td class="bold">
+                        {{
+                            $analysisResultsByLabCode[
+                                $labCode
+                            ][
+                                $requestedKey
+                            ]
+                            ?? ''
+                        }}
+                    </td>
+
+                @endforeach
+
+            @else
+
+                <td></td>
+
+            @endif
+
+        </tr>
+
+    @endforeach
+
     </tbody>
 </table>
 

@@ -26,13 +26,16 @@ use App\Http\Controllers\TextBlastController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\EquipmentController;
 
- Route::get('/login', function () {
-        if (Auth::check()) {
-            return redirect()->route('Dashboard');
-        }
-        return view('auth.login');
-        // return redirect('/homepage');
-    })->name('login'); 
+Route::get('/', function () {
+      return view('homepage');
+   });
+Route::get('/login', function () {
+   if (Auth::check()) {
+      return redirect()->route('Dashboard');
+   }
+   return view('auth.login');
+      // return redirect('/homepage');
+})->name('login'); 
 
     Route::post('login-user',[LoginController::class,'login_user'])->name('login-user');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -40,7 +43,7 @@ use App\Http\Controllers\EquipmentController;
     Route::get('/kiosk',[ClientController::class,'kiosk'])->name('kiosk');
     Route::get('/kiosk-form',[ClientController::class,'kiosk_forms'])->name('kiosk-form');
     Route::post('clients.store', [ClientController::class, 'store'])->name('clients.store');
-    Route::middleware('auth')->group(function () {
+Route::middleware('auth')->group(function () {
     Route::post('/save-settings', [UserController::class, 'UserSettings']);
     Route::get('/get-user-settings', [UserController::class, 'getSettings']);
     //System Users Information
@@ -55,20 +58,17 @@ use App\Http\Controllers\EquipmentController;
     Route::put('/users.update', [UserController::class, 'update'])->name('users.update');
     Route::delete('user.delete/{id}', [UserController::class, 'hardDelete'])->name('users.delete');
     //Clients Information
-    
     Route::get('/clients',[ClientController::class,'index'])->name('clients');
     Route::get('/create/clients', [ClientController::class, 'create'])->name('create/clients');
-  
     Route::get('clients.edit/{id}', [ClientController::class, 'edit'])->name('clients.edit');
     Route::put('/clients.update', [ClientController::class, 'update'])->name('clients.update');
     Route::delete('clients.delete/{id}', [ClientController::class, 'hardDelete'])->name('clients.delete');
-    
     // Quality Manual
     Route::get('/QM/index',[QualityManualController::class,'index'])->name('QM/index');
     Route::get('/QM/QM1-00',[QualityManualController::class,'QM1-00'])->name('QM/QM1-00');
     //SOP
     Route::get('/SOP/index',[StandardOperatingProcedureController::class,'index'])->name('SOP/index');
-     //Log Form
+   //Log Form
     Route::get('/LF/index',[LogFormController::class,'index'])->name('LF/index');
     Route::get('/lf_03_05',[LogFormController::class,'lf_03_05'])->name('lf_03_05');
     Route::post('/lf_03_05.store',[LogFormController::class,'store'])->name('lf_03_05.store');
@@ -79,7 +79,7 @@ use App\Http\Controllers\EquipmentController;
     //Work Instruction
     Route::get('/WI/index',[WorkInstructionController::class,'index'])->name('WI/index');
     //test lab
-    //RLA
+    //RLA 
     Route::get('/generate-rla-no', [LogFormController::class, 'generateRlaNo'])->name('generate.rla.no');
     Route::get('/get-latest-laboratory-code', [LogFormController::class, 'getLatestLaboratoryCode'])->name('get.latest.laboratory.code');
     Route::get('/lf_06_02',[LogFormController::class,'lf_06_02'])->name('lf_06_02');
@@ -101,11 +101,13 @@ use App\Http\Controllers\EquipmentController;
     Route::get('/job/{id}/routing', [LogFormController::class, 'jobrouting'])->name('job.jobrouting');
     Route::post('/routingForm/{id}', [LogFormController::class, 'lf_06_04_store'])->name('lf0604.store');
     Route::get('/RoutingForm/{id}/download-pdf', [LogFormController::class, 'downloadPdfRoutingForm'])->name('RoutingForm.download.pdf');
-    Route::post('/update-statusJRF/{id}', [LogFormController::class, 'updateStatusJRF'])->name('update.statusJRF');
+    Route::post('/update-statusJRF', [LogFormController::class, 'updateStatusJRF'])->name('update.statusJRF');
     //Equipment Logbooks // note naay duplicate aning equipment usage for viewing ra
     Route::get('/equipments_usage',[LogFormController::class,'equipments_usage'])->name('equipments_usage');
     Route::post('/equipment.scan',[LogFormController::class,'scan'])
     ->name('equipment.scan');
+    Route::delete('lf_03_05.delete/{id}', [LogFormController::class, 'hardDelete_lf_03_05'])->name('lf_03_05.delete');
+    Route::delete('environmental.delete/{id}', [LogFormController::class, 'hardDelete_environmental'])->name('environmental.delete');
     //Sample Disposal Logbook
     Route::get('/sample_logbook',[LogFormController::class,'sample_disposal_logbook_index'])->name('sample_logbook');
     Route::get('/create_sample_logbook', [LogFormController::class, 'sample_disposal_logbook_create'])->name('create_sample_logbook');
@@ -119,7 +121,6 @@ use App\Http\Controllers\EquipmentController;
     Route::get('/equipment_plan/index', [LogFormController::class, 'equipment_plan_index'])->name('equipment_plan.index');
     Route::get('/equipment_plan/create', [LogFormController::class, 'equipment_plan_create'])->name('equipment_plan.create');
     Route::post('/equipment_plan/store', [LogFormController::class, 'equipment_plan_store'])->name('eequipment_plan.store');
-
     //Environmental Plan Form
     Route::get('/environmental_plan/index', [LogFormController::class,'environmental_plan_index'])->name('environmental_plan/index');
     Route::get('/environmental_plan/create', [LogFormController::class,'environmental_plan_create'])->name('environmental_plan/create');
@@ -164,17 +165,19 @@ use App\Http\Controllers\EquipmentController;
     Route::get('/sterility-check', [SterilityCheckController::class, 'sterilityCheck'])->name('sterility_check.create');
     Route::post('/sterility-check/store', [SterilityCheckController::class, 'storeSterilityCheck'])->name('sterility_check.store');
     //Update status for worksheet
-    Route::post('/update-statusAW/{id}', [LogFormController::class, 'updateStatusAW'])->name('update.statusAW');
+    Route::post('/update-statusAW', [LogFormController::class, 'updateStatusAW'])->name('update.statusAW');
     //Releasing &Receiving
     Route::get('/releasing/index', [LogFormController::class,'releasing'])->name('releasing/index');
     Route::get('/releasing.download-pdf', [LogFormController::class, 'downloadPdfReleasing'])->name('releasing.download.pdf');
+    Route::post('/releasing/signature/save',[ LogFormController ::class, 'saveReleasingSignature'])->name('releasing.signature.save');
     //Report Test
     Route::get('/reporttest/index', [LogFormController::class,'ReportTest'])->name('reporttest/index');
     Route::get('/Reporttest/download/pdf/{id}', [LogFormController::class, 'ReportTestdownloadPdf'])->name('Reporttest.download.pdf');
     //Text Blast
     Route::get('/text_blast',[TextBlastController::class,'index'])->name('text_blast');
-//Equipments
-    Route::get('/equipments',[EquipmentController::class,'index'])->name('equipments.index');
+    Route::post('/text_blast/status', [TextBlastController::class, 'updateStatus'])->name('text_blast.status');
+    //Equipments
+    Route::get('/equipments/index',[EquipmentController::class,'index'])->name('equipments.index');
     Route::get('/equipments/reports',[EquipmentController::class,'reports'])->name('equipments.reports');
     Route::get('/equipments/export',[EquipmentController::class,'export'])->name('equipments.export');
     Route::get('/equipments/create',[EquipmentController::class,'create'])->name('equipments.create');
@@ -185,10 +188,11 @@ use App\Http\Controllers\EquipmentController;
     Route::get('/api/equipments/search',[EquipmentController::class,'searchEquipment'])->name('api.equipments.search');
     Route::get('/api/equipments/{id}/details',[EquipmentController::class,'getEquipmentDetails'])->name('api.equipments.details');
     Route::get('/api/users/search',[EquipmentController::class,'getUsers'])->name('api.users.search');
-     //Text Blast
+     //Reports
     Route::get('/payments.reports',[ReportController::class,'payments'])->name('payments.reports');
     Route::get('/customers.reports',[ReportController::class,'customers'])->name('customers.reports');
- });
+    Route::get('/labtest.reports',[ReportController::class,'labtest'])->name('labtest');
+});
     //ARTA SURVEY
     Route::get('/arta.create', [CitizenCharterSurveyController::class, 'arta'])->name('arta.create');
     Route::get('/citizen-charter-survey', [CitizenCharterSurveyController::class, 'index'])->name('citizen-charter-survey.index');
@@ -198,3 +202,4 @@ use App\Http\Controllers\EquipmentController;
     Route::post('/citizen-charter-survey/update/{id}', [CitizenCharterSurveyController::class, 'update'])->name('citizen-charter-survey.update');
     Route::delete('/citizen-charter-survey/delete/{id}', [CitizenCharterSurveyController::class, 'destroy'])->name('citizen-charter-survey.destroy');
     Route::get('/citizen-charter-survey/download/{id}', [CitizenCharterSurveyController::class, 'download'])->name('citizen-charter-survey.download');
+

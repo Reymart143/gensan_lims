@@ -61,15 +61,31 @@
         'DISSOLVED OXYGEN' => 'Dissolved Oxygen (mg/L)',
     ];
 
-    $selectedColumns = [];
+        $selectedColumns = [
+            'PH' => 'pH',
+            'TEMP' => 'Temp (°C)',
+            'NITRITE' => 'Nitrite (mg/L)',
+            'CALCIUM HARDNESS' => 'Calcium Hardness (mg/L)',
+            'ALKALINITY' => 'Alkalinity (mg/L)',
+            'AMMONIA' => 'Ammonia (mg/L)',
+            'DISSOLVED OXYGEN' => 'Dissolved Oxygen (mg/L)',
+        ];
+        /*
+            DISPLAY ALL ANALYSIS REQUESTED
+            Kung naa sa mapping, gamiton ang proper label.
+            Kung wala, display gihapon ang original analysis name.
+        */
+        foreach ($selectedAnalysis as $analysis) {
 
-    foreach ($selectedAnalysis as $analysis) {
-        $key = strtoupper(trim($analysis));
+            $cleanAnalysis = strtoupper(trim($analysis));
 
-        if (isset($waterQualityParams[$key])) {
-            $selectedColumns[$key] = $waterQualityParams[$key];
+            if (isset($waterQualityParams[$cleanAnalysis])) {
+                $selectedColumns[$cleanAnalysis] = $waterQualityParams[$cleanAnalysis];
+            } else {
+                // Unknown analysis - display gihapon
+                $selectedColumns[$cleanAnalysis] = $analysis;
+            }
         }
-    }
 
     /*
         Fallback kung empty ang analysis_requested.
@@ -576,7 +592,11 @@
                                         <input type="text"
                                             id="{{ $inputId }}"
                                             name="results[{{ $i }}][{{ $inputName }}]"
-                                            value="{{ old('results.' . $i . '.' . $inputName, $savedResults[$i][$inputName] ?? '') }}">
+                                         value="{{ 
+                                            in_array(strtoupper($key), array_map('strtoupper', $selectedAnalysis))
+                                                ? old('results.' . $i . '.' . $inputName, $savedResults[$i][$inputName] ?? '')
+                                                : 'N/A'
+                                        }}">
                                     </td>
                                 @endforeach
                             </tr>
@@ -595,8 +615,9 @@
                                 class="signature-select">
 
                                 <option value="">Select User</option>
-
-                                @foreach($users as $user)
+                                <option value="MMAB">MMAB</option>
+                                <option value="AAAA">AAAA</option>
+                                {{-- @foreach($users as $user)
                                     @php
                                         $fullName = trim(
                                             ($user->f_name ?? '') . ' ' .
@@ -609,7 +630,7 @@
                                         {{ old('analyzed_by_1', $worksheet->analyzed_by_1 ?? '') == $fullName ? 'selected' : '' }}>
                                         {{ $fullName }}
                                     </option>
-                                @endforeach
+                                @endforeach --}}
                             </select>
 
                             <div class="signature-line"></div>
@@ -617,14 +638,15 @@
 
                         <td>
                             Analyzed by:
-
+x
                             <select id="analyzed_by_2"
                                 name="analyzed_by_2"
                                 class="signature-select">
 
                                 <option value="">Select User</option>
-
-                                @foreach($users as $user)
+                                <option value="MMAB">MMAB</option>
+                                <option value="AAAA">AAAA</option>
+                                {{-- @foreach($users as $user)
                                     @php
                                         $fullName = trim(
                                             ($user->f_name ?? '') . ' ' .
@@ -637,7 +659,7 @@
                                         {{ old('analyzed_by_2', $worksheet->analyzed_by_2 ?? '') == $fullName ? 'selected' : '' }}>
                                         {{ $fullName }}
                                     </option>
-                                @endforeach
+                                @endforeach --}}
                             </select>
 
                             <div class="signature-line"></div>
@@ -652,7 +674,7 @@
 
                                 <option value="">Select User</option>
 
-                                @foreach($users as $user)
+                                {{-- @foreach($users as $user)
                                     @php
                                         $fullName = trim(
                                             ($user->f_name ?? '') . ' ' .
@@ -665,7 +687,9 @@
                                         {{ old('checked_by', $worksheet->checked_by ?? '') == $fullName ? 'selected' : '' }}>
                                         {{ $fullName }}
                                     </option>
-                                @endforeach
+                                @endforeach --}}
+                                <option value="MMAB">MMAB</option>
+                                <option value="AAAA">AAAA</option>
                             </select>
 
                             <div class="signature-line"></div>

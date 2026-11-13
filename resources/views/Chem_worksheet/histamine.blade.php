@@ -285,7 +285,6 @@
 
     <input type="hidden" name="user_id" value="{{ $rla->user_id }}">
     <input type="hidden" name="rla_no" value="{{ $rla->RLA_no }}">
-
     <div class="histamine-wrapper">
         <div class="histamine-page">
 
@@ -550,46 +549,88 @@
                         </td>
                     </tr>
 
-                    @php
-                        $rowCount = max(count($laboratoryCodes), count($sampleLabCode), 10);
-                    @endphp
+                  @php
+    $rowCount = 1;
+@endphp
 
-                    @for($i = 1; $i <= $rowCount; $i++)
-                        <tr class="dotted">
-                            <td>
-                                <input type="text" name="sample_laboratory_code[]" class="input-cell"
-                                    value="{{ old('sample_laboratory_code.' . $i, $sampleLabCode[$i] ?? ($laboratoryCodes[$i - 1] ?? '')) }}">
-                            </td>
-                            <td>
-                                <input type="text" name="sample_mass_sample[]" class="input-cell"
-                                    value="{{ old('sample_mass_sample.' . $i, $sampleMass[$i] ?? '') }}">
-                            </td>
-                            <td>
-                                <input type="text" name="sample_rfu[]" class="input-cell"
-                                    value="{{ old('sample_rfu.' . $i, $sampleRfu[$i] ?? '') }}">
-                            </td>
-                            <td>
-                                <input type="text" name="sample_histamine_from_curve[]" class="input-cell"
-                                    value="{{ old('sample_histamine_from_curve.' . $i, $sampleCurve[$i] ?? '') }}">
-                            </td>
-                            <td>
-                                <input type="text" name="sample_corrected_histamine[]" class="input-cell"
-                                    value="{{ old('sample_corrected_histamine.' . $i, $sampleCorrected[$i] ?? '') }}">
-                            </td>
-                            <td>
-                                <input type="text" name="sample_histamine_on_sample[]" class="input-cell"
-                                    value="{{ old('sample_histamine_on_sample.' . $i, $sampleOnSample[$i] ?? '') }}">
-                            </td>
-                            <td>
-                                <input type="text" name="sample_average_histamine_conc[]" class="input-cell"
-                                    value="{{ old('sample_average_histamine_conc.' . $i, $sampleAverage[$i] ?? '') }}">
-                            </td>
-                            <td>
-                                <input type="text" name="sample_remarks[]" class="input-cell"
-                                    value="{{ old('sample_remarks.' . $i, $sampleRemarks[$i] ?? '') }}">
-                            </td>
-                        </tr>
-                    @endfor
+@for($i = 0; $i < $rowCount; $i++)
+    <tr class="dotted">
+
+        <td>
+            <input
+                type="text"
+                name="sample_laboratory_code[]"
+                class="input-cell"
+                value="{{ old('sample_laboratory_code.' . $i, $selectedLabCode ?? '') }}"
+                readonly
+            >
+        </td>
+
+        <td>
+            <input
+                type="text"
+                name="sample_mass_sample[]"
+                class="input-cell"
+                value="{{ old('sample_mass_sample.' . $i, $sampleMass[$i] ?? '') }}"
+            >
+        </td>
+
+        <td>
+            <input
+                type="text"
+                name="sample_rfu[]"
+                class="input-cell"
+                value="{{ old('sample_rfu.' . $i, $sampleRfu[$i] ?? '') }}"
+            >
+        </td>
+
+        <td>
+            <input
+                type="text"
+                name="sample_histamine_from_curve[]"
+                class="input-cell"
+                value="{{ old('sample_histamine_from_curve.' . $i, $sampleCurve[$i] ?? '') }}"
+            >
+        </td>
+
+        <td>
+            <input
+                type="text"
+                name="sample_corrected_histamine[]"
+                class="input-cell"
+                value="{{ old('sample_corrected_histamine.' . $i, $sampleCorrected[$i] ?? '') }}"
+            >
+        </td>
+
+        <td>
+            <input
+                type="text"
+                name="sample_histamine_on_sample[]"
+                class="input-cell"
+                value="{{ old('sample_histamine_on_sample.' . $i, $sampleOnSample[$i] ?? '') }}"
+            >
+        </td>
+
+        <td>
+            <input
+                type="text"
+                name="sample_average_histamine_conc[]"
+                class="input-cell"
+                value="{{ old('sample_average_histamine_conc.' . $i, $sampleAverage[$i] ?? '') }}"
+            >
+        </td>
+
+        <td>
+            <input
+                type="text"
+                name="sample_remarks[]"
+                class="input-cell"
+                value="{{ old('sample_remarks.' . $i, $sampleRemarks[$i] ?? '') }}"
+            >
+        </td>
+
+    </tr>
+@endfor
                 </tbody>
             </table>
 
@@ -621,7 +662,6 @@
                     </td>
                 </tr>
             </table>
-
             {{-- SIGNATURES --}}
           <table class="histamine-table no-border" style="margin-top:10px;">
     <tr>
@@ -633,8 +673,9 @@
         <td class="center">
             <select name="analyst" class="signature-select">
                 <option value="">Select Analyst</option>
-
-                @foreach($users as $user)
+                 <option value="MMAB">MMAB</option>
+                 <option value="AAAA">AAAA</option>
+                {{-- @foreach($users as $user)
                     @php
                         $fullName = trim(
                             ($user->f_name ?? '') . ' ' .
@@ -647,15 +688,16 @@
                         {{ old('analyst', $worksheet->analyst ?? '') == $fullName ? 'selected' : '' }}>
                         {{ $fullName }}
                     </option>
-                @endforeach
+                @endforeach --}}
             </select>
         </td>
 
         <td class="center">
             <select name="checked_by" class="signature-select">
                 <option value="">Select Checker</option>
-
-                @foreach($users as $user)
+                 <option value="MMAB">MMAB</option>
+                 <option value="AAAA">AAAA</option>
+                {{-- @foreach($users as $user)
                     @php
                         $fullName = trim(
                             ($user->f_name ?? '') . ' ' .
@@ -668,7 +710,7 @@
                         {{ old('checked_by', $worksheet->checked_by ?? '') == $fullName ? 'selected' : '' }}>
                         {{ $fullName }}
                     </option>
-                @endforeach
+                @endforeach --}}
             </select>
         </td>
     </tr>

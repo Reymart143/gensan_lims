@@ -192,13 +192,13 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title"><span class="badge bg-warning p-3">LF-W01-MIC-03 : ANALYST WORKSHEET FOR BACTERIOLOGICAL EXAMINATION OF FISH AND FISHERY PRODUCTS</span></h4>
+                            <h4 class="card-title"><span class="badge bg-warning p-3">ANALYST WORKSHEET</span></h4>
                          
                         </div>
                        
                         </div>
                         <div class="card-body ">
-                            <input type="text" id="searchInput" style="width: 50%"  placeholder="Search Document Code or Title" class="form-control mb-3">
+                            <input type="search" id="searchInput" data-table-search="#documentsTable" style="width: 50%" placeholder="Search RLA, laboratory code, or customer" class="form-control mb-3">
                             
 
                             <div class="table-responsive">
@@ -206,9 +206,9 @@
                                     <thead>
                                         <tr class="light">
                                             <th class="text-wrap">RLA NO.</th>
-                                            <th class="text-wrap">Lab Unit</th>
+                                            <th class="text-wrap">Laboratory Code</th>
                                             <th class="text-wrap">Customer Name</th>
-                                            <th class="text-wrap">Address</th>
+                                            {{-- <th class="text-wrap">Address</th> --}}
                                             <th class="text-wrap">Sample</th>
                                             {{-- <th class="text-wrap">Payment</th>
                                            --}}
@@ -221,9 +221,9 @@
                                              <tr>
                                             
                                                 <td class="text-wrap">{{ $r->RLA_no}}</td>
-                                                <td class="text-wrap">{{ $r->lab_unit}}</td>
+                                                <td class="text-wrap">{{ $r->laboratory_code}}</td>
                                                 <td class="text-wrap">{{ $r->company_name}}</td>
-                                                <td class="text-wrap">{{ $r->address}}</td>
+                                                {{-- <td class="text-wrap">{{ $r->address}}</td> --}}
                                                 <td class="text-wrap">{{ $r->sample_desc}}</td>
                                               
                                                  {{-- <td class="text-wrap">{{ $r->payment}}</td> --}}
@@ -316,18 +316,17 @@
 
                                                     $currentStatus = $statuses[$r->status] ?? ['label' => 'Hold', 'class' => 'bg-danger'];
                                                 @endphp
-
                                                 <td>
                                                     <!-- CLICKABLE BADGE -->
                                                     <button type="button"
                                                         class="badge {{ $currentStatus['class'] }} p-2 border-0"
                                                         data-bs-toggle="modal"
-                                                        data-bs-target="#statusModal{{ $r->id }}">
+                                                        data-bs-target="#statusModal{{ $r->id }}-{{ md5((string) $r->laboratory_code) }}">
                                                         {{ $currentStatus['label'] }}
                                                     </button>
 
                                                     <!-- MODAL -->
-                                                    <div class="modal fade" id="statusModal{{ $r->id }}" tabindex="-1">
+                                                    <div class="modal fade" id="statusModal{{ $r->id }}-{{ md5((string) $r->laboratory_code) }}" tabindex="-1">
                                                         <div class="modal-dialog modal-dialog-centered">
                                                             <div class="modal-content">
 
@@ -346,7 +345,6 @@
                                                                             {{ $currentStatus['label'] }}
                                                                         </span>
                                                                     </h6>
-
                                                                     <!-- TIMELINE -->
                                                                     @foreach($statuses as $key => $status)
                                                                         <div class="timeline-item">
@@ -373,7 +371,6 @@
 
                                                                         </div>
                                                                     @endforeach
-
                                                                     @if(!array_key_exists($r->status, $statuses))
                                                                         <div class="alert alert-danger mt-3">
                                                                             This request is currently on hold.
@@ -411,7 +408,7 @@
                                                         @php
                                                             $isDisabled = $r->status != 3;
                                                         @endphp
-                                                        {{-- <a class="btn btn-sm btn-icon btn-success editRlaBtn {{ $isDisabled ? 'disabled' : '' }}"
+                                                            {{-- <a class="btn btn-sm btn-icon btn-success editRlaBtn {{ $isDisabled ? 'disabled' : '' }}"
                                                             href="{{ route('analysis_worksheet.create', $r->id) }}"
                                                             data-bs-toggle="tooltip" data-bs-placement="top" data-original-title="Edit"  aria-label="Edit" data-bs-original-title="Edit"
                                                             style="{{ $isDisabled ? 'pointer-events:none; opacity:0.6;' : '' }}">
@@ -420,7 +417,10 @@
                                                                 </span>
                                                             </a> --}}
                                                             <a class="btn btn-sm btn-icon btn-warning editRlaBtn {{ $isDisabled ? 'disabled' : '' }}"
-                                                                href="{{ route('analysis_worksheet.create', $r->id) }}"
+                                                                  href="{{ route('analysis_worksheet.create', [
+                                                                    'id' => $r->id,
+                                                                    'laboratory_code' => $r->laboratory_code
+                                                                ]) }}"
                                                                 data-bs-toggle="tooltip"
                                                                 data-bs-placement="top"
                                                                 title="Analysis Worksheet"
@@ -437,7 +437,10 @@
                                                                 </span>
                                                             </a>
                                                         <a class="btn btn-sm btn-icon btn-info"
-                                                            href="{{ route('analysis.download.pdf', $r->id) }}" data-download
+                                                            href="{{ route('analysis.download.pdf', [
+                                                                    'id' => $r->id,
+                                                                    'laboratory_code' => $r->laboratory_code
+                                                                ]) }}" data-download
                                                             data-bs-toggle="tooltip"
                                                             title="Download PDF">
                                                                 <span class="btn-inner">
@@ -446,21 +449,51 @@
                                                                     </svg>
                                                                 </span>
                                                             </a>
-                                                            @php
-                                                                $isDisabled = $r->status != 3;
-                                                            @endphp
-                                                               <form action="{{ route('update.statusAW', $r->id) }}" method="POST" class="d-inline check-form">
+                                                                 @php
+                                                                    $isDisabled = $r->status != 3;
+                                                                @endphp
+
+                                                                <form action="{{ route('update.statusAW') }}"
+                                                                    method="POST"
+                                                                    class="d-inline check-form">
+
                                                                     @csrf
-                                                                      <button type="submit"
+
+                                                                    <input type="hidden"
+                                                                        name="laboratory_code"
+                                                                        value="{{ $r->laboratory_code }}">
+
+                                                                    <input type="hidden"
+                                                                        name="rla_no"
+                                                                        value="{{ $r->RLA_no }}">
+
+                                                                    <button type="submit"
                                                                         class="btn btn-sm btn-icon btn-success check-btn {{ $isDisabled ? 'disabled' : '' }}"
                                                                         style="{{ $isDisabled ? 'pointer-events:none; opacity:0.6;' : '' }}"
                                                                         title="Checked">
 
-                                                                         <span class="btn-inner">
-                                                                         <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">                            <path fill-rule="evenodd" clip-rule="evenodd" d="M11.7281 21.9137C11.8388 21.9715 11.9627 22.0009 12.0865 22C12.2103 21.999 12.3331 21.9686 12.4449 21.9097L16.0128 20.0025C17.0245 19.4631 17.8168 18.8601 18.435 18.1579C19.779 16.6282 20.5129 14.6758 20.4998 12.6626L20.4575 6.02198C20.4535 5.25711 19.9511 4.57461 19.2082 4.32652L12.5707 2.09956C12.1711 1.96424 11.7331 1.96718 11.3405 2.10643L4.72824 4.41281C3.9893 4.67071 3.496 5.35811 3.50002 6.12397L3.54231 12.7597C3.5554 14.7758 4.31448 16.7194 5.68062 18.2335C6.3048 18.9258 7.10415 19.52 8.12699 20.0505L11.7281 21.9137ZM10.7836 14.1089C10.9326 14.2521 11.1259 14.3227 11.3192 14.3207C11.5125 14.3198 11.7047 14.2472 11.8517 14.1021L15.7508 10.2581C16.0438 9.96882 16.0408 9.50401 15.7448 9.21866C15.4478 8.9333 14.9696 8.93526 14.6766 9.22454L11.3081 12.5449L9.92885 11.2191C9.63186 10.9337 9.15467 10.9367 8.8607 11.226C8.56774 11.5152 8.57076 11.98 8.86775 12.2654L10.7836 14.1089Z" fill="currentColor"></path>                            </svg>                        
-                                                                    </span>
+                                                                        <span class="btn-inner">
+
+                                                                            <svg class="icon-20"
+                                                                                width="20"
+                                                                                viewBox="0 0 24 24"
+                                                                                fill="none"
+                                                                                xmlns="http://www.w3.org/2000/svg">
+
+                                                                                <path fill-rule="evenodd"
+                                                                                    clip-rule="evenodd"
+                                                                                    d="M11.7281 21.9137C11.8388 21.9715 11.9627 22.0009 12.0865 22C12.2103 21.999 12.3331 21.9686 12.4449 21.9097L16.0128 20.0025C17.0245 19.4631 17.8168 18.8601 18.435 18.1579C19.779 16.6282 20.5129 14.6758 20.4998 12.6626L20.4575 6.02198C20.4535 5.25711 19.9511 4.57461 19.2082 4.32652L12.5707 2.09956C12.1711 1.96424 11.7331 1.96718 11.3405 2.10643L4.72824 4.41281C3.9893 4.67071 3.496 5.35811 3.50002 6.12397L3.54231 12.7597C3.5554 14.7758 4.31448 16.7194 5.68062 18.2335C6.3048 18.9258 7.10415 19.52 8.12699 20.0505L11.7281 21.9137ZM10.7836 14.1089C10.9326 14.2521 11.1259 14.3227 11.3192 14.3207C11.5125 14.3198 11.7047 14.2472 11.8517 14.1021L15.7508 10.2581C16.0438 9.96882 16.0408 9.50401 15.7448 9.21866C15.4478 8.9333 14.9696 8.93526 14.6766 9.22454L11.3081 12.5449L9.92885 11.2191C9.63186 10.9337 9.15467 10.9367 8.8607 11.226C8.56774 11.5152 8.57076 11.98 8.86775 12.2654L10.7836 14.1089Z"
+                                                                                    fill="currentColor">
+                                                                                </path>
+
+                                                                            </svg>
+
+                                                                        </span>
+
                                                                     </button>
+
                                                                 </form>
+                                                      
                                                             <script>
                                                                $(document).on('click', '.check-btn', function(e){
                                                                     e.preventDefault();

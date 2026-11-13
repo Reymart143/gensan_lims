@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class ReportController extends Controller
 {
@@ -130,72 +131,257 @@ class ReportController extends Controller
         return 'Unknown Location';
     }
    public function customers(Request $request)
-{
-    $year = $request->year;
-    $month = $request->month;
+    {
+        $year = $request->year;
+        $month = $request->month;
 
-    $query = DB::table('clients');
+        $query = DB::table('clients');
 
-    if ($year) {
-        $query->whereYear('created_at', $year);
-    }
+        if ($year) {
+            $query->whereYear('created_at', $year);
+        }
 
-    if ($month) {
-        $query->whereMonth('created_at', $month);
-    }
+        if ($month) {
+            $query->whereMonth('created_at', $month);
+        }
 
-    $customers = $query
-        ->select(
-            'id',
-            'company_name',
-            'address',
-            'contact_no',
-            'created_at'
-        )
-        ->orderBy('created_at', 'desc')
-        ->get();
+        $customers = $query
+            ->select(
+                'id',
+                'company_name',
+                'address',
+                'contact_no',
+                'created_at'
+            )
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-    foreach ($customers as $customer) {
+        foreach ($customers as $customer) {
 
-        $customer->resolved_address = 'N/A';
+            $customer->resolved_address = 'N/A';
 
-        if (!empty($customer->address) && str_contains($customer->address, ',')) {
+            if (!empty($customer->address) && str_contains($customer->address, ',')) {
 
-            try {
+                try {
 
                 [$lat, $lng] = explode(',', $customer->address);
 
-                $response = Http::withHeaders([
-                    'User-Agent' => 'Laravel Application'
-                ])->get('https://nominatim.openstreetmap.org/reverse', [
-                    'lat' => trim($lat),
-                    'lon' => trim($lng),
-                    'format' => 'jsonv2'
-                ]);
+                    $customer->resolved_address = Cache::remember(
+                        'resolved_location_' . $customer->address,
+                        now()->addDays(30),
+                        function () use ($lat, $lng, $customer) {
 
-                if ($response->successful()) {
+                            $response = Http::timeout(3)
+                                ->withHeaders([
+                                    'User-Agent' => 'Laravel Application'
+                                ])
+                                ->get('https://nominatim.openstreetmap.org/reverse', [
+                                    'lat' => trim($lat),
+                                    'lon' => trim($lng),
+                                    'format' => 'jsonv2'
+                                ]);
 
-                    $data = $response->json();
+                            if ($response->successful()) {
 
-                    $customer->resolved_address =
-                        $data['display_name'] ?? $customer->address;
+                                $data = $response->json();
+
+                                return $data['display_name'] ?? $customer->address;
+                            }
+
+                            return $customer->address;
+                        }
+                    );
+
+                } catch (\Exception $e) {
+
+                    $customer->resolved_address = $customer->address;
+                }
+            }
+        }
+
+        $totalCustomers = $customers->count();
+
+        return view(
+            'Reports.customers',
+            compact(
+                'customers',
+                'totalCustomers'
+            )
+        );
+    }
+  public function labtest()
+{
+    $rows = DB::table('lf_06_02')->get();
+
+    // ===================== SAMPLE DESCRIPTION =====================
+
+    $fis = [
+        "Crab (Scylla serrata)" => 0,
+        "Crablets (Scylla serrata)" => 0,
+        "Shrimp fry (L. vannamei)" => 0,
+        "Polychaete (Polychaeta)" => 0,
+        "Live Tilapia Fingerlings (Oreochromis niloticus)" => 0,
+    ];
+
+    $chem = [
+        "C.O Treated Frozen Yellowfin Tuna (Thunnus albacares)" => 0,
+        "Panga (Thunnus albacares)" => 0,
+        "Frozen Yellowfin Cubes Handcut (Thunnus albacares)" => 0,
+        "Bonito Rawmat (Sarda sarda)" => 0,
+        "Frozen Tuna Bloodmeat (Thunnus albacares)" => 0,
+        "Mackerel (Scomber scombrus)" => 0,
+        "Skipjack Tuna (Katsuwonus pelamis)" => 0,
+        "Frozen Cooked Tuna Loins (Katsuwonus pelamis)" => 0,
+        "Frozen Yellowfin Tuna (Thunnus albacares)" => 0,
+        "Yellowfin Tuna Product Roe (Thunnus albacares)" => 0,
+        "Snack Bar Seaweeds Powder (Eucheuma cottonii)" => 0,
+        "Milkfish (Chanos chanos) Bone Dough" => 0,
+        "Shrimp fry (L. vannamei) Kropek Crackers" => 0,
+        "Dried Smoke Fish Skipjack (Katsuwonus pelamis)" => 0,
+        "Pond Water" => 0,
+        "Lake Water" => 0,
+        "Water" => 0,
+    ];
+
+    $micro = [
+        "Pangasius Fillet" => 0,
+        "Bullet Tuna" => 0,
+        "Frozen Yellowfin Tuna" => 0,
+        "Fermented Duck Mussel" => 0,
+        "Frozen Cooked Tuna Loins Skipjack" => 0,
+        "Tuna Panga" => 0,
+        "Tuna Tail" => 0,
+        "Nile Tilapia" => 0,
+        "Skipjack Tuna" => 0,
+        "Frozen Cooked Octopus Sliced" => 0,
+        "Tuna Entrails" => 0,
+        "Mud Clam" => 0,
+        "Carp" => 0,
+        "Fresh Frozen Yellowfin Tuna Fillet" => 0,
+        "Tuna Siomai" => 0,
+        "Tuna Sisig" => 0,
+        "Tuna Skin Pop (Regular)" => 0,
+        "Tuna Skin Pop (Hot & Spicy)" => 0,
+        "Tuna Skin Pop (Salted Egg)" => 0,
+        "Tuna Belly" => 0,
+        "Tuna Cubes" => 0,
+        "Tuna Crazy Cut" => 0,
+        "Tuna Steak" => 0,
+        "Frozen White Shrimp" => 0,
+        "Yellowfin Tuna Crazy Cut" => 0,
+        "Milkfish Cut" => 0,
+        "Pond Water" => 0,
+        "Water" => 0,
+        "ICE" => 0,
+    ];
+
+    // ===================== ANALYSIS REQUESTED =====================
+
+    $fisAnalysis = [
+        'EMS/AHPND' => 0,
+        'WSSV' => 0,
+        'EHP' => 0,
+        'TILV' => 0,
+        'Parasitological Examination' => 0,
+        'Gross Examination' => 0,
+    ];
+
+    $chemAnalysis = [
+        'HISTAMINE' => 0,
+        'MOISTURE CONTENT' => 0,
+        'pH' => 0,
+        'Alkalinity' => 0,
+        'Nitrite Nitrogen' => 0,
+        'Calcium Hardness' => 0,
+        'Dissolved Oxygen' => 0,
+    ];
+
+    $microAnalysis = [
+        'APC' => 0,
+        'E COLI' => 0,
+        'S. AUREUS' => 0,
+        'SALMONELLA' => 0,
+        'SHIGELLA' => 0,
+        'HPC' => 0,
+        'TOTAL COLIFORM' => 0,
+        'FECAL COLIFORM' => 0,
+        'ENTEROCOCCI' => 0,
+        'TOTAL LUMINOUS BACTERIAL COUNT' => 0,
+        'TOTAL VIBRIO COUNT' => 0,
+        '% YELLOW COLONIES' => 0,
+        '% GREEN COLONIES' => 0,
+    ];
+
+    foreach ($rows as $row) {
+
+        $labs = json_decode($row->lab_unit, true);
+        $samples = json_decode($row->sample_description, true);
+        $analysis = json_decode($row->analysis_requested, true);
+
+        if (!is_array($labs) || !is_array($samples)) {
+            continue;
+        }
+
+        if (!is_array($analysis)) {
+            $analysis = [];
+        }
+
+        $processed = [];
+
+        foreach ($labs as $i => $lab) {
+
+            $lab = is_array($lab) ? ($lab[0] ?? '') : $lab;
+            $sample = $samples[$i] ?? '';
+            $sample = is_array($sample) ? ($sample[0] ?? '') : $sample;
+
+            $request = $analysis[$i] ?? '';
+            $request = is_array($request) ? ($request[0] ?? '') : $request;
+
+            $lab = strtoupper(trim($lab));
+            $sample = trim($sample);
+            $request = trim($request);
+
+            $key = $row->RLA_no . '|' . $lab . '|' . $sample;
+
+            if (!isset($processed[$key])) {
+
+                $processed[$key] = true;
+
+                if ($lab == 'FIS' && isset($fis[$sample])) {
+                    $fis[$sample]++;
                 }
 
-            } catch (\Exception $e) {
+                if ($lab == 'CHEM' && isset($chem[$sample])) {
+                    $chem[$sample]++;
+                }
 
-                $customer->resolved_address = $customer->address;
+                if (($lab == 'MIC' || $lab == 'MICRO') && isset($micro[$sample])) {
+                    $micro[$sample]++;
+                }
+            }
+
+            // Analysis Requested Count
+            if ($lab == 'FIS' && isset($fisAnalysis[$request])) {
+                $fisAnalysis[$request]++;
+            }
+
+            if ($lab == 'CHEM' && isset($chemAnalysis[$request])) {
+                $chemAnalysis[$request]++;
+            }
+
+            if (($lab == 'MIC' || $lab == 'MICRO') && isset($microAnalysis[$request])) {
+                $microAnalysis[$request]++;
             }
         }
     }
 
-    $totalCustomers = $customers->count();
-
-    return view(
-        'Reports.customers',
-        compact(
-            'customers',
-            'totalCustomers'
-        )
-    );
+    return view('Reports.labtest', compact(
+        'fis',
+        'chem',
+        'micro',
+        'fisAnalysis',
+        'chemAnalysis',
+        'microAnalysis'
+    ));
 }
 }

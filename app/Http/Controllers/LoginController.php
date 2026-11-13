@@ -14,20 +14,16 @@ class LoginController extends Controller
 {
   public function login_user(Request $request){
     $credentials = $request->only('username', 'password');
-
     if (Auth::attempt($credentials)) {
-
         $user = DB::table('users')
             ->where('username', $request->get('username'))
             ->first();
-
         Session()->put([
             'isLogin' => 1,
             'username' => $request->get('username'),
             'pass' => $request->get('password'),
             'id' => $user->id
         ]);
-
         return redirect()->route('Dashboard')
             ->with('success', 'Login successful!');
     }

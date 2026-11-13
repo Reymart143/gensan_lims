@@ -18,11 +18,11 @@ return new class extends Migration
 
             $table->date('date')->nullable();
 
-            $table->decimal('temperature_am', 5, 2)->nullable();
-            $table->decimal('temperature_pm', 5, 2)->nullable();
+            $table->string('temperature_am')->nullable();
+            $table->string('temperature_pm')->nullable();
 
-            $table->decimal('humidity_am', 5, 2)->nullable();
-            $table->decimal('humidity_pm', 5, 2)->nullable();
+            $table->string('humidity_am')->nullable();
+            $table->string('humidity_pm')->nullable();
 
             $table->text('remarks')->nullable();
             $table->string('analyst')->nullable();

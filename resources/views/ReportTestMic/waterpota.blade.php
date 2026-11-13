@@ -501,9 +501,9 @@
                 <td class="bold">{!! nl2br(e($sampleType)) !!}</td>
 
                 @if ($resultColumnCount > 0)
-                    @foreach ($analysisRequested as $requested)
+                  @foreach ($analysisRequested as $requested)
                         <td class="bold">
-                            {{ $getPotabilityResult($labCode, $requested) }}
+                            {{ $analysisResultsByLabCode[$labCode][$requested] ?? '' }}
                         </td>
                     @endforeach
                 @else
